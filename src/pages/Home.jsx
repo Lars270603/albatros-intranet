@@ -7,6 +7,7 @@ import { SkeletonCard } from '@/components/shared/SkeletonCard'
 import { EmptyState } from '@/components/shared/EmptyState'
 import { TeamWidget } from '@/components/home/TeamWidget'
 import { PollWidget } from '@/components/home/PollWidget'
+import { ProductsWidget } from '@/components/home/ProductsWidget'
 import { HomeHeader } from '@/components/home/HomeHeader'
 import { useAuth } from '@/hooks/useAuth'
 import { usePosts } from '@/hooks/usePosts'
@@ -64,7 +65,7 @@ export default function Home() {
       <HomeHeader firstName={profile?.first_name} />
 
       <div className="grid gap-8 md:grid-cols-[65%_1fr]">
-        <div className="space-y-5">
+        <div className="min-w-0 space-y-5">
           {loading ? (
             <>
               <SkeletonCard />
@@ -120,9 +121,10 @@ export default function Home() {
           )}
         </div>
 
-        <div className="space-y-6">
+        <div className="min-w-0 space-y-6">
           <TeamWidget />
           <PollWidget />
+          <ProductsWidget />
         </div>
       </div>
     </div>

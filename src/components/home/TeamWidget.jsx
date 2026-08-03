@@ -83,11 +83,15 @@ export function TeamWidget() {
             {newColleagues.map((p) => (
               <div key={p.id} className="flex items-center gap-3">
                 <InitialsAvatar firstName={p.first_name} lastName={p.last_name} avatarUrl={p.avatar_url} size={40} />
-                <span className="flex-1 text-[14px] text-text">
-                  {p.first_name} {p.last_name}
-                </span>
-                <DepartmentBadge department={p.department} />
-                <span className="text-[12px] font-medium text-primary">Neu</span>
+                <div className="min-w-0 flex-1 space-y-0.5">
+                  <p className="truncate text-[14px] text-text">
+                    {p.first_name} {p.last_name}
+                  </p>
+                  <div className="flex items-center gap-1.5">
+                    <DepartmentBadge department={p.department} />
+                    <span className="text-[12px] font-medium text-primary">Neu</span>
+                  </div>
+                </div>
               </div>
             ))}
           </div>
