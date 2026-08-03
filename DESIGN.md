@@ -166,9 +166,9 @@ Keine weiteren dekorativen Animationen (keine Loops, kein Parallax, nichts > 200
 
 ## Bilder & Platzhalter
 `https://picsum.photos` als Platzhalter, bis echte Fotos eingesetzt werden:
-- Home-Banner: `picsum.photos/800/320`, dunkles Overlay `rgba(0,0,0,0.08)`, radius 12px
 - Produktkarten ohne Bild: `picsum.photos/400/300?grayscale` + BrandBadge-Overlay oben links
 Bilder sind Akzente, kein Vollbild-Hero, keine Stock-Foto-Wände, nichts überlappt Text.
+Die Homepage-Begrüßung ist bewusst rein typographisch (kein Bild/Banner).
 
 ## Anti-Patterns (explizit verboten)
 - Gradient Backgrounds
@@ -316,41 +316,58 @@ Page Transitions: Motion AnimatePresence + motion.div mit initial={{ opacity: 0,
 
 ### Home (/)
 
-2-Spalten-Grid: 65% links / 35% rechts. Gap: 32px.
+Oben — Begrüßungsbereich (volle Breite, rein typographisch, kein Bild/Banner):
+- Links: dynamische Tageszeit-Begrüßung ("Guten Morgen/Tag/Abend, {Vorname}"), Plus Jakarta Sans 800 40px, tracking -0.03em. Darunter Wochentag + Datum ausgeschrieben, Geist 400, text-sub.
+- Rechts: 3 Stat-Karten (aktive Mitarbeiter / Produkte / offene Ideen) — große Zahl (Plus Jakarta Sans 800 32px) + Label (12px uppercase) darunter, keine Icons/Bilder.
+- Motion: Begrüßung fade+translateY(12px→0) 150ms; Stat-Karten gestaffelt 60ms Delay je Karte.
 
-Linke Spalte:
+Darunter — 2-Spalten-Grid: 65% links / 35% rechts. Gap: 32px.
+
+Linke Spalte — Feed:
 
 Gepinnter Post (falls vorhanden):
 - shadcn Card mit border-l-4 border-l-[#DC2626] bg-[#FEF2F2]
-- Label: kleines Badge "📌 Angepinnt" in Rot
+- Badge "Angepinnt" (Pin-Icon statt Emoji) in Rot
 - Titel, kurzer Body-Auszug, Autor
 
-Feed darunter:
-- Scope: general + eigene Abteilung, gemischt nach created_at DESC
-- Supabase Realtime Subscription für Live-Updates
+Feed darunter — News-Posts UND neue Produkte gemischt, sortiert nach created_at DESC:
+- Scope (Posts): general + eigene Abteilung
+- Supabase Realtime Subscription für Live-Updates (Posts)
 - Skeleton-Loader beim initialen Load (3 Karten)
+- Gestaffelte Eintritts-Animation, 40ms Delay je Karte
 
-Post-Karte (shadcn Card):
+Post-Karte (PostCard, size="feature" auf Home — größer als auf /news):
 - Header: Avatar (32px) + Name (Geist 500 14px) + DepartmentBadge + relativer Timestamp
-- Titel: Plus Jakarta Sans 700 17px
+- Titel: Plus Jakarta Sans 700 20px (17px auf /news)
 - Body: Geist 400 15px, voller Text
-- Bild (falls vorhanden): volle Kartenbreite, max-height 320px, object-cover, innerhalb der Card
-- Footer: Reaktions-Buttons (👍 🎉 👀 + Zähler). Wenn bereits reagiert: filled icon + bg-[#FEF2F2]. Toggle-Logik: zweites Klicken entfernt Reaktion
+- Bild (falls vorhanden): volle Kartenbreite, max-height 380px (320px auf /news), object-cover
+- Kein Bild: gedämpfter Abteilungsfarb-Streifen (opacity 0.06) statt leerem Bereich
+- Anhang (falls vorhanden): Datei-Icon + Name + "Herunterladen"-Button
+- Footer: Reaktions-Buttons (👍 🎉 👀 + Zähler, funktionale Emoji) + Kommentar-Icon mit Anzahl-Badge (klappt Kommentarbereich auf/zu)
+- Kommentarbereich (aufklappbar): chronologisch älteste oben, Avatar 32px + Name + Timestamp + Text, Löschen für eigene Kommentare + Admin, Textarea + "Kommentieren"-Button, Supabase Realtime
 - Admin: Pin-Icon + Trash-Icon (ghost buttons, rechts)
+- Card-Padding 24px, Hover: translateY(-2px) + border-color var(--border-strong), 150ms (stärker als der Standard-Karten-Hover von -1px)
+
+Produkt-Feed-Karte (ProductFeedCard) — visuell klar von News-Posts unterscheidbar:
+- Rotes Label "Neues Produkt" oben
+- BrandBadge + Produktname (Plus Jakarta Sans 700 19px)
+- Kurzbeschreibung 2 Zeilen (line-clamp-2) falls vorhanden
+- Hauptbild volle Breite, max-height 280px, object-cover, falls vorhanden
+- Footer: "Von {Name} · {Datum}" + "Zum Produkt →" Link
 
 Rechte Spalte:
 
-Team-Widget (shadcn Card): Titel-Label "TEAM" (Geist 500 11px uppercase tracking-wide text-muted)
-- Geburtstage diese Woche: Avatar (32px) + Name + "🎂 Heute" (rot) oder "in X Tagen"
+Team-Widget (shadcn Card): Titel-Label "TEAM" (Geist 500 12px uppercase tracking-[0.08em] text-muted)
+- Geburtstags-Erinnerung (nächste 7 Tage, Tag+Monat verglichen, Jahr ignoriert): Avatar (40px) + 🎂 Name. Heute: rot hervorgehoben, eigener Hintergrund (bg-primary-light). In 1–7 Tagen: "Geburtstag in X Tagen". Sortiert nach Nähe. Abschnitt komplett ausgeblendet wenn niemand in den nächsten 7 Tagen Geburtstag hat.
 - Separator
-- Neue Kollegen (letzte 30 Tage): Avatar + Name + DepartmentBadge + "Neu"
+- Neue Kollegen (letzte 30 Tage): Avatar (40px) + Name + DepartmentBadge + "Neu"
 - Falls beides leer: Card nicht rendern
 
 Umfragen-Widget (shadcn Card): Nur rendern wenn aktive Poll vorhanden (nicht abgelaufen, Scope passend).
-- Fragetext (Plus Jakarta Sans 700 15px)
+- Fragetext (Plus Jakarta Sans 700 16px)
 - Antwortoptionen: shadcn Button variant="outline" volle Breite
 - Nach Abstimmung: Fortschrittsbalken je Option. Eigene Stimme: Balken in Rot, andere in Grau. Prozentzahl rechts daneben
-- "Endet in X Tagen" (Caption, unten)
+- "Endet in X Tagen" (Caption) + "Details"-Link zur Umfrage-Detailseite
 - unique(poll_id, user_id) verhindert Doppelabstimmung
 
 ### News (/news)

@@ -22,11 +22,11 @@ export function PollWidget() {
 
   return (
     <Card>
-      <CardHeader className="pb-2">
+      <CardHeader className="pb-3">
         <p className="text-[12px] font-medium uppercase tracking-[0.08em] text-text-muted">Umfrage</p>
       </CardHeader>
-      <CardContent className="space-y-3">
-        <p className="font-display text-[15px] font-bold text-text">{poll.question}</p>
+      <CardContent className="space-y-4">
+        <p className="font-display text-[16px] font-bold leading-snug text-text">{poll.question}</p>
 
         {!myVote ? (
           <div className="space-y-2">
@@ -42,18 +42,18 @@ export function PollWidget() {
             ))}
           </div>
         ) : (
-          <div className="space-y-2">
+          <div className="space-y-3">
             {options.map((option) => {
               const count = votes.filter((v) => v.option_id === option.id).length
               const pct = totalVotes > 0 ? Math.round((count / totalVotes) * 100) : 0
               const isMine = myVote.option_id === option.id
               return (
-                <div key={option.id} className="space-y-1">
+                <div key={option.id} className="space-y-1.5">
                   <div className="flex items-center justify-between text-[13px]">
                     <span className="text-text">{option.label}</span>
                     <span className="font-medium text-text-sub">{pct}%</span>
                   </div>
-                  <div className="h-1.5 w-full overflow-hidden rounded-full bg-surface-2">
+                  <div className="h-2 w-full overflow-hidden rounded-full bg-surface-2">
                     <div
                       className={cn('h-full rounded-full', isMine ? 'bg-primary' : 'bg-border-strong')}
                       style={{ width: `${pct}%` }}

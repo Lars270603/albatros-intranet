@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react'
-import { Cake } from 'lucide-react'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { Separator } from '@/components/ui/separator'
 import { InitialsAvatar } from '@/components/shared/InitialsAvatar'
@@ -24,7 +23,7 @@ export function TeamWidget() {
         const withBirthdays = (data || [])
           .filter((p) => p.birthday)
           .map((p) => ({ ...p, _daysUntil: daysUntil(nextBirthday(p.birthday)) }))
-          .filter((p) => p._daysUntil <= 6)
+          .filter((p) => p._daysUntil <= 7)
           .sort((a, b) => a._daysUntil - b._daysUntil)
 
         const recent = (data || [])
@@ -49,26 +48,31 @@ export function TeamWidget() {
       <CardHeader className="pb-2">
         <p className="text-[12px] font-medium uppercase tracking-[0.08em] text-text-muted">Team</p>
       </CardHeader>
-      <CardContent className="space-y-4">
+      <CardContent className="space-y-5">
         {birthdays.length > 0 && (
-          <div className="space-y-2.5">
-            {birthdays.map((p) => (
-              <div key={p.id} className="flex items-center gap-2.5">
-                <InitialsAvatar firstName={p.first_name} lastName={p.last_name} avatarUrl={p.avatar_url} size={32} />
-                <span className="flex-1 text-[14px] text-text">
-                  {p.first_name} {p.last_name}
-                </span>
-                <span
+          <div className="space-y-2">
+            {birthdays.map((p) => {
+              const isToday = p._daysUntil === 0
+              return (
+                <div
+                  key={p.id}
                   className={cn(
-                    'flex items-center gap-1 text-[12px]',
-                    p._daysUntil === 0 ? 'font-medium text-primary' : 'text-text-muted'
+                    'flex items-center gap-3 rounded-md p-2.5',
+                    isToday && 'bg-primary-light'
                   )}
                 >
-                  {p._daysUntil === 0 && <Cake className="h-3.5 w-3.5" strokeWidth={1.5} />}
-                  {p._daysUntil === 0 ? 'Heute' : `in ${p._daysUntil} Tagen`}
-                </span>
-              </div>
-            ))}
+                  <InitialsAvatar firstName={p.first_name} lastName={p.last_name} avatarUrl={p.avatar_url} size={40} />
+                  <div className="flex-1 space-y-0.5">
+                    <p className={cn('text-[14px] font-medium', isToday ? 'text-primary' : 'text-text')}>
+                      🎂 {p.first_name} {p.last_name}
+                    </p>
+                    <p className={cn('text-[12px]', isToday ? 'font-medium text-primary' : 'text-text-muted')}>
+                      {isToday ? 'Heute ist Geburtstag!' : `Geburtstag in ${p._daysUntil} Tagen`}
+                    </p>
+                  </div>
+                </div>
+              )
+            })}
           </div>
         )}
 
@@ -77,8 +81,8 @@ export function TeamWidget() {
         {newColleagues.length > 0 && (
           <div className="space-y-2.5">
             {newColleagues.map((p) => (
-              <div key={p.id} className="flex items-center gap-2.5">
-                <InitialsAvatar firstName={p.first_name} lastName={p.last_name} avatarUrl={p.avatar_url} size={32} />
+              <div key={p.id} className="flex items-center gap-3">
+                <InitialsAvatar firstName={p.first_name} lastName={p.last_name} avatarUrl={p.avatar_url} size={40} />
                 <span className="flex-1 text-[14px] text-text">
                   {p.first_name} {p.last_name}
                 </span>

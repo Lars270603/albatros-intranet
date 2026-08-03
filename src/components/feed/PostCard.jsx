@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Pin, Trash2, Download } from 'lucide-react'
+import { Pin, Trash2, Download, MessageCircle } from 'lucide-react'
 import { Card } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -18,13 +18,27 @@ import { InitialsAvatar } from '@/components/shared/InitialsAvatar'
 import { DepartmentBadge } from '@/components/shared/DepartmentBadge'
 import { RelativeTime } from '@/components/shared/RelativeTime'
 import { ReactionBar } from '@/components/feed/ReactionBar'
+import { CommentThread } from '@/components/feed/CommentThread'
 import { FileTypeIcon } from '@/components/documents/FileTypeIcon'
 import { DEPARTMENTS } from '@/components/shared/DepartmentBadge'
+import { useComments } from '@/hooks/useComments'
 import { cn, hexToRgba } from '@/lib/utils'
 
-export function PostCard({ post, reactions, onToggleReaction, isAdmin, onTogglePin, onDelete, pinnedStyle = false }) {
+export function PostCard({
+  post,
+  reactions,
+  onToggleReaction,
+  isAdmin,
+  onTogglePin,
+  onDelete,
+  pinnedStyle = false,
+  size = 'default',
+}) {
   const [deleting, setDeleting] = useState(false)
+  const [commentsOpen, setCommentsOpen] = useState(false)
+  const { comments, addComment, deleteComment } = useComments(post.id)
   const author = post.author
+  const feature = size === 'feature'
 
   async function handleDelete() {
     setDeleting(true)
@@ -39,10 +53,11 @@ export function PostCard({ post, reactions, onToggleReaction, isAdmin, onToggleP
     <Card
       className={cn(
         'overflow-hidden',
+        feature && 'hover:-translate-y-[2px]',
         pinnedStyle && 'border-l-4 border-l-primary bg-primary-light'
       )}
     >
-      <div className="flex items-start justify-between gap-3 p-5 pb-3">
+      <div className={cn('flex items-start justify-between gap-3 pb-3', feature ? 'p-6' : 'p-5')}>
         <div className="flex items-center gap-3">
           <InitialsAvatar
             firstName={author?.first_name}
@@ -109,13 +124,15 @@ export function PostCard({ post, reactions, onToggleReaction, isAdmin, onToggleP
         </div>
       </div>
 
-      <div className="px-5 pb-2">
-        <h3 className="font-display text-[17px] font-bold text-text">{post.title}</h3>
+      <div className={cn('pb-2', feature ? 'px-6' : 'px-5')}>
+        <h3 className={cn('font-display font-bold text-text', feature ? 'text-[20px]' : 'text-[17px]')}>
+          {post.title}
+        </h3>
         <p className="mt-1.5 whitespace-pre-wrap text-[15px] leading-relaxed text-text">{post.body}</p>
       </div>
 
       {post.attachment_url && (
-        <div className="mx-5 mb-3 flex items-center gap-3 rounded-md border border-border bg-surface p-3">
+        <div className={cn('mb-3 flex items-center gap-3 rounded-md border border-border bg-surface p-3', feature ? 'mx-6' : 'mx-5')}>
           <FileTypeIcon
             fileType={post.attachment_name?.split('.').pop()}
             className="h-5 w-5 shrink-0"
@@ -138,7 +155,7 @@ export function PostCard({ post, reactions, onToggleReaction, isAdmin, onToggleP
         <img
           src={post.image_url}
           alt={post.title}
-          className="max-h-[320px] w-full object-cover"
+          className={cn('w-full object-cover', feature ? 'max-h-[380px]' : 'max-h-[320px]')}
         />
       ) : (
         <div
@@ -147,9 +164,25 @@ export function PostCard({ post, reactions, onToggleReaction, isAdmin, onToggleP
         />
       )}
 
-      <div className="flex items-center justify-between p-5 pt-3">
+      <div className={cn('flex items-center justify-between pt-3', feature ? 'p-6' : 'p-5')}>
         <ReactionBar postId={post.id} reactions={reactions} onToggle={onToggleReaction} />
+        <button
+          onClick={() => setCommentsOpen((v) => !v)}
+          className={cn(
+            'flex items-center gap-1.5 rounded-md border px-2.5 py-1 text-[13px] transition-colors',
+            commentsOpen
+              ? 'border-primary-light bg-primary-light text-primary'
+              : 'border-border text-text-sub hover:bg-surface'
+          )}
+        >
+          <MessageCircle className="h-4 w-4" strokeWidth={1.5} />
+          {comments.length > 0 && <span className="font-medium">{comments.length}</span>}
+        </button>
       </div>
+
+      {commentsOpen && (
+        <CommentThread comments={comments} onAddComment={addComment} onDeleteComment={deleteComment} />
+      )}
     </Card>
   )
 }

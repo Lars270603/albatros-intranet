@@ -318,3 +318,20 @@ create policy "ideas_update" on ideas for update using (auth.uid() is not null);
 create policy "idea_votes_select" on idea_votes for select using (auth.uid() is not null);
 create policy "idea_votes_insert" on idea_votes for insert with check (auth.uid() = user_id);
 create policy "idea_votes_delete" on idea_votes for delete using (auth.uid() = user_id);
+
+-- ============================================================
+-- UPDATE v2 (siehe supabase/migrations/003_update_v2.sql)
+-- ============================================================
+
+-- News-Kommentare
+create table if not exists news_comments (
+  id uuid default gen_random_uuid() primary key,
+  post_id uuid references news_posts(id) on delete cascade not null,
+  body text not null,
+  author_id uuid references profiles(id) on delete cascade not null,
+  created_at timestamptz default now()
+);
+alter table news_comments enable row level security;
+create policy "nc_select" on news_comments for select using (auth.uid() is not null);
+create policy "nc_insert" on news_comments for insert with check (auth.uid() = author_id);
+create policy "nc_delete" on news_comments for delete using (auth.uid() = author_id);
