@@ -1,15 +1,12 @@
 import { Navigate, Outlet } from 'react-router-dom'
 import { useAuth } from '@/hooks/useAuth'
+import { AppShellSkeleton } from '@/components/layout/AppShellSkeleton'
 
 export function ProtectedRoute() {
   const { user, profile, loading } = useAuth()
 
   if (loading) {
-    return (
-      <div className="flex min-h-screen items-center justify-center">
-        <div className="h-8 w-8 animate-spin rounded-full border-2 border-border border-t-primary" />
-      </div>
-    )
+    return <AppShellSkeleton />
   }
 
   if (!user || !profile || profile.status !== 'active') {

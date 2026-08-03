@@ -96,7 +96,7 @@ export default function Contacts() {
     <div className="space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div className="space-y-1">
-          <h1 className="font-display text-[28px] font-extrabold tracking-tight text-text">Wichtige Kontakte</h1>
+          <h1 className="font-display text-[32px] font-extrabold tracking-tight text-text">Wichtige Kontakte</h1>
         </div>
         {isAdmin && (
           <Button onClick={openCreate}>

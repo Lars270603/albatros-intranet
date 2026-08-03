@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Plus, X } from 'lucide-react'
+import { Plus, X, Lock, Eye } from 'lucide-react'
 import {
   Dialog,
   DialogContent,
@@ -167,14 +167,22 @@ export function PollCreateDialog({ open, onOpenChange, onCreated }) {
             >
               <div className="flex items-center gap-2">
                 <RadioGroupItem value="anonymous" id="poll-anonymous" />
-                <Label htmlFor="poll-anonymous" className="cursor-pointer text-[14px] font-normal normal-case tracking-normal text-text">
-                  🔒 Anonym — niemand sieht wer wie abgestimmt hat
+                <Label
+                  htmlFor="poll-anonymous"
+                  className="flex cursor-pointer items-center gap-1.5 text-[14px] font-normal normal-case tracking-normal text-text"
+                >
+                  <Lock className="h-3.5 w-3.5 text-text-muted" strokeWidth={1.5} />
+                  Anonym — niemand sieht wer wie abgestimmt hat
                 </Label>
               </div>
               <div className="flex items-center gap-2">
                 <RadioGroupItem value="public" id="poll-public" />
-                <Label htmlFor="poll-public" className="cursor-pointer text-[14px] font-normal normal-case tracking-normal text-text">
-                  👁 Öffentlich — jeder sieht wer wie abgestimmt hat
+                <Label
+                  htmlFor="poll-public"
+                  className="flex cursor-pointer items-center gap-1.5 text-[14px] font-normal normal-case tracking-normal text-text"
+                >
+                  <Eye className="h-3.5 w-3.5 text-text-muted" strokeWidth={1.5} />
+                  Öffentlich — jeder sieht wer wie abgestimmt hat
                 </Label>
               </div>
             </RadioGroup>

@@ -5,6 +5,7 @@ import { SkeletonCard } from '@/components/shared/SkeletonCard'
 import { EmptyState } from '@/components/shared/EmptyState'
 import { TeamWidget } from '@/components/home/TeamWidget'
 import { PollWidget } from '@/components/home/PollWidget'
+import { GreetingBanner } from '@/components/home/GreetingBanner'
 import { useAuth } from '@/hooks/useAuth'
 import { usePosts } from '@/hooks/usePosts'
 import { useToast } from '@/components/ui/use-toast'
@@ -40,7 +41,10 @@ export default function Home() {
   }
 
   return (
-    <div className="grid gap-8 md:grid-cols-[65%_1fr]">
+    <div className="space-y-8">
+      <GreetingBanner firstName={profile?.first_name} />
+
+      <div className="grid gap-8 md:grid-cols-[65%_1fr]">
       <div className="space-y-5">
         {loading ? (
           <>
@@ -88,6 +92,7 @@ export default function Home() {
       <div className="space-y-6">
         <TeamWidget />
         <PollWidget />
+      </div>
       </div>
     </div>
   )

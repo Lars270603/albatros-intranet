@@ -59,7 +59,7 @@ export function Sidebar({ onNavigate }) {
             onClick={onNavigate}
             className={({ isActive }) =>
               cn(
-                'flex items-center gap-3 rounded-md border-l-2 border-transparent px-3 py-2 text-[14px] font-normal text-text-sub transition-colors',
+                'flex h-11 items-center gap-3 rounded-md border-l-2 border-transparent px-3 text-[14px] font-normal text-text-sub transition-colors',
                 isActive
                   ? 'border-primary bg-primary-light font-medium text-primary'
                   : 'hover:bg-surface-2 hover:text-text'
@@ -77,7 +77,7 @@ export function Sidebar({ onNavigate }) {
             onClick={onNavigate}
             className={({ isActive }) =>
               cn(
-                'flex items-center gap-3 rounded-md border-l-2 border-transparent px-3 py-2 text-[14px] font-normal text-text-sub transition-colors',
+                'flex h-11 items-center gap-3 rounded-md border-l-2 border-transparent px-3 text-[14px] font-normal text-text-sub transition-colors',
                 isActive
                   ? 'border-primary bg-primary-light font-medium text-primary'
                   : 'hover:bg-surface-2 hover:text-text'

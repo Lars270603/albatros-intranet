@@ -25,6 +25,12 @@ VERBOTENE PATTERNS (niemals bauen):
 - Generic Tailwind-Starter-Template-Look
 - Centered text block as hero
 - Rounded pill buttons als primary CTA
+- Spinner-Loader (immer Skeleton statt Spinner)
+- Emojis als UI-Elemente (Ausnahme: funktionale Reaktions-Emojis im Datenmodell)
+- Animationen länger als 200ms
+
+KARTEN-HOVER (der einzige Tiefeneffekt):
+`border-color: var(--border-strong) + transform: translateY(-1px)`, `transition: all 150ms ease`.
 
 FARB-DISZIPLIN:
 Eine dominante Akzentfarbe: #DC2626 (Albatros Rot).

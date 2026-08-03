@@ -159,7 +159,7 @@ export default function PollDetail() {
 
       {!poll.is_anonymous && votes.length > 0 && (
         <div className="space-y-3 pt-4">
-          <p className="text-[13px] font-medium uppercase tracking-wide text-text-muted">Gesamtübersicht</p>
+          <p className="text-[12px] font-medium uppercase tracking-[0.08em] text-text-muted">Gesamtübersicht</p>
           <Table>
             <TableHeader>
               <TableRow>

@@ -19,7 +19,8 @@ import { DepartmentBadge } from '@/components/shared/DepartmentBadge'
 import { RelativeTime } from '@/components/shared/RelativeTime'
 import { ReactionBar } from '@/components/feed/ReactionBar'
 import { FileTypeIcon } from '@/components/documents/FileTypeIcon'
-import { cn } from '@/lib/utils'
+import { DEPARTMENTS } from '@/components/shared/DepartmentBadge'
+import { cn, hexToRgba } from '@/lib/utils'
 
 export function PostCard({ post, reactions, onToggleReaction, isAdmin, onTogglePin, onDelete, pinnedStyle = false }) {
   const [deleting, setDeleting] = useState(false)
@@ -62,7 +63,10 @@ export function PostCard({ post, reactions, onToggleReaction, isAdmin, onToggleP
 
         <div className="flex items-center gap-2">
           {pinnedStyle && (
-            <Badge className="border-transparent bg-primary text-white">📌 Angepinnt</Badge>
+            <Badge className="gap-1 border-transparent bg-primary text-white">
+              <Pin className="h-3 w-3 fill-current" strokeWidth={1.5} />
+              Angepinnt
+            </Badge>
           )}
           {isAdmin && (
             <>
@@ -130,11 +134,16 @@ export function PostCard({ post, reactions, onToggleReaction, isAdmin, onToggleP
         </div>
       )}
 
-      {post.image_url && (
+      {post.image_url ? (
         <img
           src={post.image_url}
           alt={post.title}
           className="max-h-[320px] w-full object-cover"
+        />
+      ) : (
+        <div
+          className="h-12 w-full"
+          style={{ backgroundColor: hexToRgba(DEPARTMENTS[post.scope]?.text || '#9CA3AF', 0.06) }}
         />
       )}
 

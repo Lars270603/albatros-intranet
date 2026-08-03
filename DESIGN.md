@@ -1,20 +1,24 @@
 # Albatros Intranet — Design System
 
+> **v2 (Redesign)** — visuelles Refinement, Funktionalität unverändert. Werte in diesem Dokument
+> spiegeln den aktuell live geschalteten Stand wider.
+
 ## Referenz-Ästhetik
 Vercel Dashboard + Stripe Dashboard.
 Hell, präzise, technisch. Nicht generisch, nicht KI-generiert wirkend.
 Hierarchie entsteht aus Typographie und Spacing — nicht aus Boxen und Borders.
+Fast monochrom: Rot erscheint ausschließlich bei aktiven States, CTAs und Badges.
 
 ## Farben
 ```css
 :root {
   --bg:           #FFFFFF;
-  --surface:      #F9FAFB;
+  --surface:      #F8F9FA;
   --surface-2:    #F3F4F6;
   --border:       #E5E7EB;
   --border-strong:#D1D5DB;
   --text:         #111827;
-  --text-sub:     #4B5563;
+  --text-sub:     #6B7280;
   --text-muted:   #9CA3AF;
   --accent:       #DC2626;
   --accent-hover: #B91C1C;
@@ -25,6 +29,8 @@ Hierarchie entsteht aus Typographie und Spacing — nicht aus Boxen und Borders.
   --warning-light:#FFFBEB;
 }
 ```
+Kein Beige, kein Cream, kein Warm-White. Maximal eine Akzentfarbe (#DC2626) —
+Success/Warning/Destructive sind semantische Systemfarben, kein zweiter Brand-Akzent.
 
 ## Typographie
 Font-Import (index.html):
@@ -34,23 +40,29 @@ Geist: weights 400, 500
 JetBrains Mono: weight 400
 
 Skala:
-- H1: Plus Jakarta Sans 800, 28px, tracking -0.02em, color: var(--text)
+- H1 / Seitentitel: Plus Jakarta Sans 800, 32px, tracking -0.02em, color: var(--text)
 - H2: Plus Jakarta Sans 700, 22px, tracking -0.01em
 - H3: Plus Jakarta Sans 700, 18px
-- Label/Sub: Geist 500, 13px, uppercase, tracking 0.06em, color: var(--text-sub)
+- Sub-Label: Geist 500, 12px, uppercase, tracking 0.08em, color: var(--text-sub)
 - Body: Geist 400, 15px, line-height 1.6
 - Caption: Geist 400, 13px, color: var(--text-muted)
 - Code: JetBrains Mono 400, 13px
+
+Gewichte extrem einsetzen — 800 für Haupttitel, 400 für Fließtext, nichts Halbes dazwischen.
 
 ## Karten
 ```css
 border: 1px solid var(--border);
 border-radius: 12px;
 background: var(--bg);
-/* KEIN box-shadow */
+/* KEIN box-shadow — Border ist der einzige Tiefeneffekt */
 ```
-Hover: `border-color: var(--border-strong)`
-Transition: `border-color 150ms ease`
+Hover:
+```css
+border-color: var(--border-strong);
+transform: translateY(-1px);
+transition: all 150ms ease;
+```
 
 ## Buttons
 Primary:
@@ -94,6 +106,7 @@ Focus: `border-color: var(--accent); outline: none; box-shadow: 0 0 0 3px var(--
 Breite: 240px, fixiert
 Hintergrund: var(--surface)
 Rechter Border: 1px solid var(--border)
+Nav-Item Höhe: 44px
 
 Nav-Item aktiv:
 ```css
@@ -102,6 +115,8 @@ color: var(--accent);
 border-left: 2px solid var(--accent);
 font-weight: 500;
 ```
+
+Nav-Item inaktiv: color: var(--text-sub), kein Hintergrund.
 
 Nav-Item hover:
 ```css
@@ -131,6 +146,29 @@ Text: white, font: Plus Jakarta Sans 700
 
 ## Spacing
 8px Grid: 4 / 8 / 12 / 16 / 24 / 32 / 48 / 64 / 80 / 96
+Page-Padding: 32px · Section-Gap: 40px · Card-Padding: 20px. Niemals ungerade Zahlen.
+
+## Tabellen
+Zeilen: 48px Höhe. Hover: background: var(--surface). Kein Border zwischen Zeilen —
+nur ein subtiler border-bottom: 1px solid var(--surface-2).
+
+## Empty States
+Großes Lucide-Icon (text-gray-200), darunter Titel (color: var(--text-sub)),
+darunter optionaler CTA. Niemals einfach leer.
+
+## Skeleton Loader
+Nur background: var(--surface-2) Rechtecke mit animate-pulse. Kein Spinner — nirgends.
+
+## Animationen
+Page Transition: opacity 0→1 + translateY 6px→0, duration: 120ms.
+Card-Hover: 150ms ease (siehe oben).
+Keine weiteren dekorativen Animationen (keine Loops, kein Parallax, nichts > 200ms).
+
+## Bilder & Platzhalter
+`https://picsum.photos` als Platzhalter, bis echte Fotos eingesetzt werden:
+- Home-Banner: `picsum.photos/800/320`, dunkles Overlay `rgba(0,0,0,0.08)`, radius 12px
+- Produktkarten ohne Bild: `picsum.photos/400/300?grayscale` + BrandBadge-Overlay oben links
+Bilder sind Akzente, kein Vollbild-Hero, keine Stock-Foto-Wände, nichts überlappt Text.
 
 ## Anti-Patterns (explizit verboten)
 - Gradient Backgrounds
@@ -138,11 +176,13 @@ Text: white, font: Plus Jakarta Sans 700
 - box-shadow als primäres Styling-Tool
 - Equal-width three-column card heroes
 - "Elevate your workflow"-Marketing-Copy
-- Emoji in UI-Labels (außer explizit gefordert)
+- Emoji als UI-Elemente (Ausnahme: funktionale Reaktions-Emojis 👍🎉👀, da Teil des Datenmodells)
 - Lorem Ipsum
 - Neon Glow Effects
 - Custom Cursor
 - Glassmorphism / Frosted Glass
+- Rounded Pill Buttons als Primary CTA
+- Animationen länger als 200ms
 
 ## Projekt-Setup
 

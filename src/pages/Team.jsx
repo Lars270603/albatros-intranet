@@ -34,7 +34,7 @@ export default function Team() {
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-2.5">
-        <h1 className="font-display text-[28px] font-extrabold tracking-tight text-text">Team</h1>
+        <h1 className="font-display text-[32px] font-extrabold tracking-tight text-text">Team</h1>
         {!loading && <Badge variant="secondary">{members.length} Mitglieder</Badge>}
       </div>
 
@@ -57,6 +57,7 @@ export default function Team() {
                   lastName={member.last_name}
                   avatarUrl={member.avatar_url}
                   size={64}
+                  soft
                 />
                 <p className="font-display text-[16px] font-bold text-text">
                   {member.first_name} {member.last_name}

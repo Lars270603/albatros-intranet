@@ -26,7 +26,7 @@ TableFooter.displayName = 'TableFooter'
 const TableRow = React.forwardRef(({ className, ...props }, ref) => (
   <tr
     ref={ref}
-    className={cn('border-b border-border transition-colors hover:bg-surface', className)}
+    className={cn('h-12 border-b border-surface-2 transition-colors hover:bg-surface', className)}
     {...props}
   />
 ))
@@ -36,7 +36,7 @@ const TableHead = React.forwardRef(({ className, ...props }, ref) => (
   <th
     ref={ref}
     className={cn(
-      'h-10 px-3 text-left align-middle text-xs font-medium uppercase tracking-wide text-text-muted [&:has([role=checkbox])]:pr-0',
+      'h-10 px-3 text-left align-middle text-[12px] font-medium uppercase tracking-[0.08em] text-text-muted [&:has([role=checkbox])]:pr-0',
       className
     )}
     {...props}

@@ -104,7 +104,7 @@ export default function Profile() {
 
   return (
     <div className="mx-auto max-w-[560px] space-y-6">
-      <h1 className="font-display text-[28px] font-extrabold tracking-tight text-text">Profil</h1>
+      <h1 className="font-display text-[32px] font-extrabold tracking-tight text-text">Profil</h1>
 
       <Card>
         <CardContent className="space-y-6 pt-6">
@@ -193,7 +193,7 @@ export default function Profile() {
           <Separator />
 
           <form onSubmit={handleChangePassword} className="space-y-4">
-            <p className="text-[13px] font-medium uppercase tracking-wide text-text-sub">Passwort ändern</p>
+            <p className="text-[12px] font-medium uppercase tracking-[0.08em] text-text-sub">Passwort ändern</p>
             <div className="space-y-1.5">
               <Label htmlFor="newPassword">Neues Passwort</Label>
               <Input

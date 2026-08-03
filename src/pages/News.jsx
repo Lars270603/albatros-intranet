@@ -50,7 +50,7 @@ export default function News() {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="font-display text-[28px] font-extrabold tracking-tight text-text">News</h1>
+        <h1 className="font-display text-[32px] font-extrabold tracking-tight text-text">News</h1>
         {canPost && (
           <Button onClick={() => setComposerOpen(true)}>
             <Plus className="h-4 w-4" strokeWidth={1.5} />

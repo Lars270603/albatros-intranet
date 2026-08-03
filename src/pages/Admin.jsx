@@ -34,7 +34,7 @@ export default function Admin() {
 
   return (
     <div className="space-y-6">
-      <h1 className="font-display text-[28px] font-extrabold tracking-tight text-text">Admin-Panel</h1>
+      <h1 className="font-display text-[32px] font-extrabold tracking-tight text-text">Admin-Panel</h1>
 
       <Tabs defaultValue="pending">
         <TabsList>

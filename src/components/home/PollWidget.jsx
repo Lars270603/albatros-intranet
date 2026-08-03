@@ -19,7 +19,7 @@ export function PollWidget() {
   return (
     <Card>
       <CardHeader className="pb-2">
-        <p className="text-[11px] font-medium uppercase tracking-wide text-text-muted">Umfrage</p>
+        <p className="text-[12px] font-medium uppercase tracking-[0.08em] text-text-muted">Umfrage</p>
       </CardHeader>
       <CardContent className="space-y-3">
         <p className="font-display text-[15px] font-bold text-text">{poll.question}</p>

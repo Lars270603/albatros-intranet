@@ -20,6 +20,7 @@ import { SectionEditDialog } from '@/components/onboarding/SectionEditDialog'
 import { useToast } from '@/components/ui/use-toast'
 import { useAuth } from '@/hooks/useAuth'
 import { useOnboarding } from '@/hooks/useOnboarding'
+import albatrosLogo from '@/assets/albatros-logo.png'
 
 export default function Onboarding() {
   const { profile } = useAuth()
@@ -62,14 +63,21 @@ export default function Onboarding() {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-wrap items-start justify-between gap-4">
-        <div className="space-y-1">
-          <h1 className="font-display text-[28px] font-extrabold tracking-tight text-text">
-            Onboarding — Willkommen bei Albatros International
-          </h1>
-          <p className="text-[15px] text-text-sub">
-            Alles was du für deinen Start wissen musst.
-          </p>
+      <div className="flex flex-wrap items-start gap-4">
+        <div className="flex flex-1 items-center justify-between gap-6 rounded-xl bg-primary-light px-8 py-8">
+          <div className="space-y-1">
+            <h1 className="font-display text-[32px] font-extrabold leading-tight tracking-tight text-text">
+              Willkommen bei Albatros
+            </h1>
+            <p className="text-[15px] text-text-sub">
+              Alles was du für deinen Start wissen musst.
+            </p>
+          </div>
+          <img
+            src={albatrosLogo}
+            alt="Albatros"
+            className="hidden h-20 w-20 shrink-0 rounded-xl sm:block"
+          />
         </div>
         {isAdmin && (
           <Button onClick={openCreate}>

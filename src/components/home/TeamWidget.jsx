@@ -1,10 +1,12 @@
 import { useEffect, useState } from 'react'
+import { Cake } from 'lucide-react'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { Separator } from '@/components/ui/separator'
 import { InitialsAvatar } from '@/components/shared/InitialsAvatar'
 import { DepartmentBadge } from '@/components/shared/DepartmentBadge'
 import { supabase } from '@/lib/supabase'
 import { nextBirthday, daysUntil } from '@/lib/dateUtils'
+import { cn } from '@/lib/utils'
 
 export function TeamWidget() {
   const [birthdays, setBirthdays] = useState([])
@@ -45,7 +47,7 @@ export function TeamWidget() {
   return (
     <Card>
       <CardHeader className="pb-2">
-        <p className="text-[11px] font-medium uppercase tracking-wide text-text-muted">Team</p>
+        <p className="text-[12px] font-medium uppercase tracking-[0.08em] text-text-muted">Team</p>
       </CardHeader>
       <CardContent className="space-y-4">
         {birthdays.length > 0 && (
@@ -56,8 +58,14 @@ export function TeamWidget() {
                 <span className="flex-1 text-[14px] text-text">
                   {p.first_name} {p.last_name}
                 </span>
-                <span className={p._daysUntil === 0 ? 'text-[12px] font-medium text-primary' : 'text-[12px] text-text-muted'}>
-                  {p._daysUntil === 0 ? '🎂 Heute' : `in ${p._daysUntil} Tagen`}
+                <span
+                  className={cn(
+                    'flex items-center gap-1 text-[12px]',
+                    p._daysUntil === 0 ? 'font-medium text-primary' : 'text-text-muted'
+                  )}
+                >
+                  {p._daysUntil === 0 && <Cake className="h-3.5 w-3.5" strokeWidth={1.5} />}
+                  {p._daysUntil === 0 ? 'Heute' : `in ${p._daysUntil} Tagen`}
                 </span>
               </div>
             ))}

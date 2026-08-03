@@ -1,5 +1,4 @@
 import { useNavigate } from 'react-router-dom'
-import { Package } from 'lucide-react'
 import { Card } from '@/components/ui/card'
 import { BrandBadge } from '@/components/shared/BrandBadge'
 import { InitialsAvatar } from '@/components/shared/InitialsAvatar'
@@ -12,18 +11,23 @@ export function ProductCard({ product }) {
   return (
     <Card
       onClick={() => navigate(`/products/${product.id}`)}
-      className="cursor-pointer overflow-hidden hover:border-border-strong"
+      className="cursor-pointer overflow-hidden"
     >
       {mainImage ? (
         <img src={mainImage} alt={product.name} className="aspect-[4/3] w-full object-cover" />
       ) : (
-        <div className="flex aspect-[4/3] w-full items-center justify-center bg-surface">
-          <Package className="h-12 w-12 text-gray-200" strokeWidth={1.5} />
+        <div className="relative aspect-[4/3] w-full">
+          <img
+            src={`https://picsum.photos/seed/${product.id}/400/300?grayscale`}
+            alt=""
+            className="h-full w-full object-cover"
+          />
+          <BrandBadge brand={product.brand} className="absolute left-2 top-2" />
         </div>
       )}
 
       <div className="space-y-2 p-4">
-        <BrandBadge brand={product.brand} />
+        {mainImage && <BrandBadge brand={product.brand} />}
         <h3 className="font-display text-[15px] font-bold text-text">{product.name}</h3>
         <p className="text-[13px] text-text-muted">Eingestellt am {formatDate(product.created_at)}</p>
         <div className="flex items-center gap-2 pt-1">

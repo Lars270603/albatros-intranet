@@ -108,7 +108,7 @@ DropdownMenuRadioItem.displayName = DropdownMenuPrimitive.RadioItem.displayName
 const DropdownMenuLabel = React.forwardRef(({ className, inset, ...props }, ref) => (
   <DropdownMenuPrimitive.Label
     ref={ref}
-    className={cn('px-2 py-1.5 text-xs font-medium uppercase tracking-wide text-text-muted', inset && 'pl-8', className)}
+    className={cn('px-2 py-1.5 text-[12px] font-medium uppercase tracking-[0.08em] text-text-muted', inset && 'pl-8', className)}
     {...props}
   />
 ))

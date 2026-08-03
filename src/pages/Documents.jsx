@@ -84,7 +84,7 @@ export default function Documents() {
 
   return (
     <div className="space-y-6">
-      <h1 className="font-display text-[28px] font-extrabold tracking-tight text-text">Archiv</h1>
+      <h1 className="font-display text-[32px] font-extrabold tracking-tight text-text">Archiv</h1>
 
       <div className="grid gap-8 md:grid-cols-[200px_1fr]">
         <div className="space-y-1">

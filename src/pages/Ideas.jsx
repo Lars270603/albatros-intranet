@@ -66,7 +66,7 @@ export default function Ideas() {
   return (
     <div className="space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-4">
-        <h1 className="font-display text-[28px] font-extrabold tracking-tight text-text">Ideenboard</h1>
+        <h1 className="font-display text-[32px] font-extrabold tracking-tight text-text">Ideenboard</h1>
         <Button onClick={() => setComposerOpen(true)}>
           <Plus className="h-4 w-4" strokeWidth={1.5} />
           Idee einreichen
