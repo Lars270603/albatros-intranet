@@ -3,6 +3,7 @@ import { Outlet, useLocation } from 'react-router-dom'
 import { AnimatePresence, motion } from 'motion/react'
 import { Menu, X } from 'lucide-react'
 import { Sidebar } from '@/components/layout/Sidebar'
+import albatrosLogo from '@/assets/albatros-logo.png'
 
 export function Layout() {
   const [drawerOpen, setDrawerOpen] = useState(false)
@@ -19,9 +20,7 @@ export function Layout() {
         >
           <Menu className="h-5 w-5" strokeWidth={1.5} />
         </button>
-        <div className="flex h-6 w-6 items-center justify-center rounded-md bg-primary font-display text-[12px] font-extrabold text-white">
-          A
-        </div>
+        <img src={albatrosLogo} alt="Albatros" className="h-7 w-7 shrink-0 rounded-md" />
         <span className="font-display text-[14px] font-bold text-text">Albatros Intranet</span>
       </div>
 

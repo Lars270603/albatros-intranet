@@ -17,6 +17,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 import { useToast } from '@/components/ui/use-toast'
 import { useAuth } from '@/hooks/useAuth'
 import { supabase } from '@/lib/supabase'
@@ -37,6 +38,7 @@ export function PollCreateDialog({ open, onOpenChange, onCreated }) {
   const [options, setOptions] = useState(['', ''])
   const [scope, setScope] = useState('general')
   const [expiresAt, setExpiresAt] = useState('')
+  const [isAnonymous, setIsAnonymous] = useState(false)
   const [submitting, setSubmitting] = useState(false)
 
   function reset() {
@@ -44,6 +46,7 @@ export function PollCreateDialog({ open, onOpenChange, onCreated }) {
     setOptions(['', ''])
     setScope('general')
     setExpiresAt('')
+    setIsAnonymous(false)
   }
 
   function updateOption(index, value) {
@@ -77,6 +80,7 @@ export function PollCreateDialog({ open, onOpenChange, onCreated }) {
         scope,
         created_by: user.id,
         expires_at: expiresAt ? new Date(expiresAt).toISOString() : null,
+        is_anonymous: isAnonymous,
       })
       if (error) throw error
 
@@ -153,6 +157,27 @@ export function PollCreateDialog({ open, onOpenChange, onCreated }) {
           <div className="space-y-1.5">
             <Label htmlFor="poll-expires">Ablaufdatum (optional)</Label>
             <Input id="poll-expires" type="date" value={expiresAt} onChange={(e) => setExpiresAt(e.target.value)} />
+          </div>
+
+          <div className="space-y-2">
+            <Label>Abstimmung</Label>
+            <RadioGroup
+              value={isAnonymous ? 'anonymous' : 'public'}
+              onValueChange={(v) => setIsAnonymous(v === 'anonymous')}
+            >
+              <div className="flex items-center gap-2">
+                <RadioGroupItem value="anonymous" id="poll-anonymous" />
+                <Label htmlFor="poll-anonymous" className="cursor-pointer text-[14px] font-normal normal-case tracking-normal text-text">
+                  🔒 Anonym — niemand sieht wer wie abgestimmt hat
+                </Label>
+              </div>
+              <div className="flex items-center gap-2">
+                <RadioGroupItem value="public" id="poll-public" />
+                <Label htmlFor="poll-public" className="cursor-pointer text-[14px] font-normal normal-case tracking-normal text-text">
+                  👁 Öffentlich — jeder sieht wer wie abgestimmt hat
+                </Label>
+              </div>
+            </RadioGroup>
           </div>
 
           <DialogFooter>

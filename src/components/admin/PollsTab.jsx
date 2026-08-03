@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from 'react'
-import { Plus, Trash2, BarChart3 } from 'lucide-react'
+import { Link } from 'react-router-dom'
+import { Plus, Trash2, BarChart3, Eye } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import {
@@ -86,7 +87,7 @@ export function PollsTab() {
               <TableHead>Erstellt von</TableHead>
               <TableHead>Läuft bis</TableHead>
               <TableHead>Stimmen</TableHead>
-              <TableHead className="text-right">Löschen</TableHead>
+              <TableHead className="text-right">Aktionen</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -100,6 +101,12 @@ export function PollsTab() {
                 <TableCell>{poll.expires_at ? formatDate(poll.expires_at) : '—'}</TableCell>
                 <TableCell>{poll.poll_votes?.length || 0}</TableCell>
                 <TableCell className="text-right">
+                  <div className="flex justify-end gap-1">
+                    <Button variant="ghost" size="icon" className="h-8 w-8" asChild>
+                      <Link to={`/polls/${poll.id}`} title="Details">
+                        <Eye className="h-4 w-4" strokeWidth={1.5} />
+                      </Link>
+                    </Button>
                   <AlertDialog>
                     <AlertDialogTrigger asChild>
                       <Button variant="ghost" size="icon" className="h-8 w-8">
@@ -122,6 +129,7 @@ export function PollsTab() {
                       </AlertDialogFooter>
                     </AlertDialogContent>
                   </AlertDialog>
+                  </div>
                 </TableCell>
               </TableRow>
             ))}

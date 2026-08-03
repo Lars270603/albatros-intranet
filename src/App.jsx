@@ -12,6 +12,10 @@ import Documents from '@/pages/Documents'
 import Products from '@/pages/Products'
 import ProductNew from '@/pages/ProductNew'
 import ProductDetail from '@/pages/ProductDetail'
+import Onboarding from '@/pages/Onboarding'
+import Contacts from '@/pages/Contacts'
+import Ideas from '@/pages/Ideas'
+import PollDetail from '@/pages/PollDetail'
 import Team from '@/pages/Team'
 import Admin from '@/pages/Admin'
 import Profile from '@/pages/Profile'
@@ -32,6 +36,10 @@ export default function App() {
               <Route path="/products" element={<Products />} />
               <Route path="/products/new" element={<ProductNew />} />
               <Route path="/products/:id" element={<ProductDetail />} />
+              <Route path="/onboarding" element={<Onboarding />} />
+              <Route path="/contacts" element={<Contacts />} />
+              <Route path="/ideas" element={<Ideas />} />
+              <Route path="/polls/:id" element={<PollDetail />} />
               <Route path="/team" element={<Team />} />
               <Route path="/profile" element={<Profile />} />
 

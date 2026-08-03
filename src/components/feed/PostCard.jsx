@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Pin, Trash2 } from 'lucide-react'
+import { Pin, Trash2, Download } from 'lucide-react'
 import { Card } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -18,6 +18,7 @@ import { InitialsAvatar } from '@/components/shared/InitialsAvatar'
 import { DepartmentBadge } from '@/components/shared/DepartmentBadge'
 import { RelativeTime } from '@/components/shared/RelativeTime'
 import { ReactionBar } from '@/components/feed/ReactionBar'
+import { FileTypeIcon } from '@/components/documents/FileTypeIcon'
 import { cn } from '@/lib/utils'
 
 export function PostCard({ post, reactions, onToggleReaction, isAdmin, onTogglePin, onDelete, pinnedStyle = false }) {
@@ -108,6 +109,26 @@ export function PostCard({ post, reactions, onToggleReaction, isAdmin, onToggleP
         <h3 className="font-display text-[17px] font-bold text-text">{post.title}</h3>
         <p className="mt-1.5 whitespace-pre-wrap text-[15px] leading-relaxed text-text">{post.body}</p>
       </div>
+
+      {post.attachment_url && (
+        <div className="mx-5 mb-3 flex items-center gap-3 rounded-md border border-border bg-surface p-3">
+          <FileTypeIcon
+            fileType={post.attachment_name?.split('.').pop()}
+            className="h-5 w-5 shrink-0"
+          />
+          <span className="flex-1 truncate text-[13px] font-medium text-text">
+            {post.attachment_name}
+          </span>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => window.open(post.attachment_url, '_blank')}
+          >
+            <Download className="h-3.5 w-3.5" strokeWidth={1.5} />
+            Herunterladen
+          </Button>
+        </div>
+      )}
 
       {post.image_url && (
         <img

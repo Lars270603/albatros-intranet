@@ -78,12 +78,12 @@ export function DocumentUploadDialog({ open, onOpenChange, onUploaded }) {
       })
       if (error) throw error
 
-      toast({ title: 'Dokument hochgeladen' })
+      toast({ title: 'Datei hochgeladen' })
       onUploaded?.()
       reset()
       onOpenChange(false)
     } catch (err) {
-      console.error('Dokument konnte nicht hochgeladen werden:', err)
+      console.error('Datei konnte nicht hochgeladen werden:', err)
       toast({ variant: 'destructive', title: 'Fehler', description: 'Upload fehlgeschlagen.' })
     } finally {
       setSubmitting(false)
@@ -94,7 +94,7 @@ export function DocumentUploadDialog({ open, onOpenChange, onUploaded }) {
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Dokument hochladen</DialogTitle>
+          <DialogTitle>Datei hochladen</DialogTitle>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-4">

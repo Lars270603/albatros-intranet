@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { useActivePoll } from '@/hooks/usePoll'
@@ -60,9 +61,16 @@ export function PollWidget() {
           </div>
         )}
 
-        {poll.expires_at && (
-          <p className="text-[12px] text-text-muted">Endet in {daysUntil(poll.expires_at)} Tagen</p>
-        )}
+        <div className="flex items-center justify-between pt-1">
+          {poll.expires_at ? (
+            <p className="text-[12px] text-text-muted">Endet in {daysUntil(poll.expires_at)} Tagen</p>
+          ) : (
+            <span />
+          )}
+          <Link to={`/polls/${poll.id}`} className="text-[12px] font-medium text-primary hover:underline">
+            Details
+          </Link>
+        </div>
       </CardContent>
     </Card>
   )

@@ -1,5 +1,5 @@
 import { NavLink } from 'react-router-dom'
-import { Home, Newspaper, FolderOpen, Package, Users, ShieldCheck } from 'lucide-react'
+import { Home, Newspaper, Archive, Package, BookOpen, Phone, Lightbulb, Users, Settings } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { InitialsAvatar } from '@/components/shared/InitialsAvatar'
 import { NotificationDropdown } from '@/components/layout/NotificationDropdown'
@@ -7,12 +7,16 @@ import { useAuth } from '@/hooks/useAuth'
 import { supabase } from '@/lib/supabase'
 import { DEPARTMENTS } from '@/components/shared/DepartmentBadge'
 import { cn } from '@/lib/utils'
+import albatrosLogo from '@/assets/albatros-logo.png'
 
 const NAV_ITEMS = [
   { to: '/', label: 'Home', icon: Home, end: true },
   { to: '/news', label: 'News', icon: Newspaper },
-  { to: '/documents', label: 'Dokumente', icon: FolderOpen },
+  { to: '/documents', label: 'Archiv', icon: Archive },
   { to: '/products', label: 'Neue Produkte', icon: Package },
+  { to: '/onboarding', label: 'Onboarding', icon: BookOpen },
+  { to: '/contacts', label: 'Kontakte', icon: Phone },
+  { to: '/ideas', label: 'Ideen', icon: Lightbulb },
   { to: '/team', label: 'Team', icon: Users },
 ]
 
@@ -41,10 +45,8 @@ export function Sidebar({ onNavigate }) {
 
   return (
     <div className="flex h-full flex-col bg-surface">
-      <div className="flex items-center gap-2 px-5 py-5">
-        <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-primary font-display text-[15px] font-extrabold text-white">
-          A
-        </div>
+      <div className="flex items-center gap-2.5 px-5 py-5">
+        <img src={albatrosLogo} alt="Albatros" className="h-10 w-10 shrink-0 rounded-md" />
         <span className="font-display text-[15px] font-bold text-text">Albatros Intranet</span>
       </div>
 
@@ -82,7 +84,7 @@ export function Sidebar({ onNavigate }) {
               )
             }
           >
-            <ShieldCheck className="h-5 w-5" strokeWidth={1.5} />
+            <Settings className="h-5 w-5" strokeWidth={1.5} />
             Admin
             {pendingCount > 0 && (
               <span className="ml-auto flex h-5 min-w-[20px] items-center justify-center rounded-full bg-primary px-1 text-[11px] font-medium text-white">

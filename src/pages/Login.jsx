@@ -5,6 +5,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { supabase } from '@/lib/supabase'
 import { useAuth } from '@/hooks/useAuth'
+import albatrosLogo from '@/assets/albatros-logo.png'
 
 export default function Login() {
   const navigate = useNavigate()
@@ -53,9 +54,7 @@ export default function Login() {
     <div className="flex min-h-screen">
       <div className="hidden w-[420px] shrink-0 flex-col justify-between bg-surface border-r border-border p-12 lg:flex">
         <div className="flex items-center gap-2">
-          <div className="flex h-8 w-8 items-center justify-center rounded-md bg-primary font-display text-[15px] font-extrabold text-white">
-            A
-          </div>
+          <img src={albatrosLogo} alt="Albatros" className="h-8 w-8 shrink-0 rounded-md" />
           <span className="font-display text-[15px] font-bold text-text">Albatros Intranet</span>
         </div>
         <div>
@@ -63,7 +62,7 @@ export default function Login() {
             Alles, was das Team braucht — an einem Ort.
           </p>
           <p className="mt-3 text-[15px] text-text-sub">
-            News, Dokumente, Produkte und dein Team-Verzeichnis.
+            News, Archiv, Produkte und dein Team-Verzeichnis.
           </p>
         </div>
         <p className="text-[13px] text-text-muted">Albatros International GmbH</p>
