@@ -1,3 +1,4 @@
+import { useMemo } from 'react'
 import { Link } from 'react-router-dom'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -8,7 +9,10 @@ import { cn } from '@/lib/utils'
 
 export function PollWidget() {
   const { profile } = useAuth()
-  const scopes = profile ? ['general', profile.department] : ['general']
+  const scopes = useMemo(
+    () => (profile ? ['general', profile.department] : ['general']),
+    [profile]
+  )
   const { poll, votes, myVote, loading, castVote } = useActivePoll(scopes)
 
   if (loading || !poll) return null
