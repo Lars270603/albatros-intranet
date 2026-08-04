@@ -2,7 +2,6 @@ import { useMemo } from 'react'
 import { motion } from 'motion/react'
 import { MessageSquare } from 'lucide-react'
 import { PostCard } from '@/components/feed/PostCard'
-import { ProductFeedCard } from '@/components/products/ProductFeedCard'
 import { SkeletonCard } from '@/components/shared/SkeletonCard'
 import { EmptyState } from '@/components/shared/EmptyState'
 import { TeamWidget } from '@/components/home/TeamWidget'
@@ -11,7 +10,6 @@ import { ProductsWidget } from '@/components/home/ProductsWidget'
 import { HomeHeader } from '@/components/home/HomeHeader'
 import { useAuth } from '@/hooks/useAuth'
 import { usePosts } from '@/hooks/usePosts'
-import { useProductsFeed } from '@/hooks/useProductsFeed'
 import { useToast } from '@/components/ui/use-toast'
 
 export default function Home() {
@@ -21,27 +19,12 @@ export default function Home() {
     () => (profile ? ['general', profile.department] : ['general']),
     [profile]
   )
-  const { posts, reactions, loading: postsLoading, toggleReaction, togglePin, deletePost } = usePosts(scopes)
-  const { products, loading: productsLoading } = useProductsFeed()
+  const { posts, reactions, loading, toggleReaction, togglePin, deletePost } = usePosts(scopes)
 
-  const loading = postsLoading || productsLoading
   const isAdmin = profile?.role === 'admin'
 
   const pinnedPost = posts.find((p) => p.pinned) || null
   const feedPosts = pinnedPost ? posts.filter((p) => p.id !== pinnedPost.id) : posts
-
-  const feedItems = useMemo(() => {
-    const items = [
-      ...feedPosts.map((post) => ({ type: 'post', id: `post-${post.id}`, created_at: post.created_at, post })),
-      ...products.map((product) => ({
-        type: 'product',
-        id: `product-${product.id}`,
-        created_at: product.created_at,
-        product,
-      })),
-    ]
-    return items.sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
-  }, [feedPosts, products])
 
   async function handleDelete(postId) {
     try {
@@ -87,33 +70,29 @@ export default function Home() {
                 />
               )}
 
-              {feedItems.length === 0 && !pinnedPost ? (
+              {feedPosts.length === 0 && !pinnedPost ? (
                 <EmptyState
                   icon={MessageSquare}
                   title="Noch keine Beiträge"
-                  description="Sobald jemand einen Beitrag oder ein Produkt veröffentlicht, erscheint es hier."
+                  description="Sobald jemand einen Beitrag veröffentlicht, erscheint er hier."
                 />
               ) : (
-                feedItems.map((item, index) => (
+                feedPosts.map((post, index) => (
                   <motion.div
-                    key={item.id}
+                    key={post.id}
                     initial={{ opacity: 0, y: 12 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.2, ease: 'easeOut', delay: index * 0.04 }}
                   >
-                    {item.type === 'post' ? (
-                      <PostCard
-                        post={item.post}
-                        reactions={reactions[item.post.id]}
-                        onToggleReaction={toggleReaction}
-                        isAdmin={isAdmin}
-                        onTogglePin={handleTogglePin}
-                        onDelete={handleDelete}
-                        size="feature"
-                      />
-                    ) : (
-                      <ProductFeedCard product={item.product} />
-                    )}
+                    <PostCard
+                      post={post}
+                      reactions={reactions[post.id]}
+                      onToggleReaction={toggleReaction}
+                      isAdmin={isAdmin}
+                      onTogglePin={handleTogglePin}
+                      onDelete={handleDelete}
+                      size="feature"
+                    />
                   </motion.div>
                 ))
               )}
