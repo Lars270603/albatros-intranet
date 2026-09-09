@@ -144,16 +144,11 @@ export function PostCard({
         </div>
       )}
 
-      {post.image_url ? (
+      {post.image_url && (
         <img
           src={post.image_url}
           alt={post.title}
           className={cn('w-full object-cover', feature ? 'max-h-[380px]' : 'max-h-[320px]')}
-        />
-      ) : (
-        <div
-          className="h-12 w-full"
-          style={{ backgroundColor: `var(--dept-${post.scope}-bg, var(--surface-2))` }}
         />
       )}
 

@@ -10,9 +10,9 @@ export function Layout() {
   const location = useLocation()
 
   return (
-    <div className="min-h-screen bg-bg">
+    <div className="min-h-screen bg-surface">
       {/* Mobile Top-Bar */}
-      <div className="fixed inset-x-0 top-0 z-30 flex h-14 items-center gap-3 border-b border-border bg-bg px-4 md:hidden">
+      <div className="fixed inset-x-0 top-0 z-30 flex h-14 items-center gap-3 border-b border-border bg-surface px-4 md:hidden">
         <button
           onClick={() => setDrawerOpen(true)}
           className="flex h-9 w-9 items-center justify-center rounded-md text-text-sub hover:bg-surface-2"

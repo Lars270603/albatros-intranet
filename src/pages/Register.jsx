@@ -90,20 +90,20 @@ export default function Register() {
 
   return (
     <div className="flex min-h-screen">
-      <div className="hidden w-[420px] shrink-0 flex-col justify-between bg-surface border-r border-border p-12 lg:flex">
+      <div className="hidden w-[420px] shrink-0 flex-col bg-surface border-r border-border p-12 lg:flex">
         <div className="flex items-center gap-2">
           <img src={albatrosLogo} alt="Albatros" className="h-8 w-8 shrink-0 rounded-md" />
           <span className="font-display text-[15px] font-bold text-text">Albatros Intranet</span>
         </div>
-        <div>
-          <p className="font-display text-2xl font-extrabold leading-tight text-text">
+        <div className="mt-24">
+          <p className="font-display text-[32px] font-extrabold leading-[1.15] tracking-[-0.03em] text-text">
             Alles, was das Team braucht — an einem Ort.
           </p>
           <p className="mt-3 text-[15px] text-text-sub">
             News, Archiv, Produkte und dein Team-Verzeichnis.
           </p>
         </div>
-        <p className="text-[13px] text-text-muted">Albatros International GmbH</p>
+        <p className="mt-auto text-[13px] text-text-muted">Albatros International GmbH</p>
       </div>
 
       <div className="flex flex-1 items-center justify-center p-6">

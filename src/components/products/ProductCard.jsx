@@ -1,21 +1,29 @@
 import { useNavigate } from 'react-router-dom'
 import { Package } from 'lucide-react'
 import { Card } from '@/components/ui/card'
-import { BrandBadge } from '@/components/shared/BrandBadge'
+import { BrandBadge, BRANDS } from '@/components/shared/BrandBadge'
 import { InitialsAvatar } from '@/components/shared/InitialsAvatar'
 import { formatDate } from '@/lib/dateUtils'
 
 export function ProductCard({ product }) {
   const navigate = useNavigate()
   const mainImage = product.product_images?.[0]?.image_url
+  const brandColors = BRANDS[product.brand]
 
   return (
     <Card onClick={() => navigate(`/products/${product.id}`)} className="cursor-pointer overflow-hidden">
       {mainImage ? (
         <img src={mainImage} alt={product.name} className="aspect-[4/3] w-full object-cover" />
       ) : (
-        <div className="flex aspect-[4/3] w-full items-center justify-center bg-surface-2">
-          <Package className="h-12 w-12 text-text-muted" strokeWidth={1.5} />
+        <div
+          className="flex aspect-[4/3] w-full items-center justify-center"
+          style={{ backgroundColor: brandColors?.bg || 'var(--surface-2)' }}
+        >
+          <Package
+            className="h-10 w-10"
+            style={{ color: brandColors?.fg || 'var(--text-muted)', opacity: 0.55 }}
+            strokeWidth={1.5}
+          />
         </div>
       )}
 
