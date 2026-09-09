@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { motion } from 'motion/react'
 import { Plus, Package } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { SkeletonCard } from '@/components/shared/SkeletonCard'
@@ -50,7 +51,7 @@ export default function Products() {
   return (
     <div className="space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-4">
-        <h1 className="font-display text-[32px] font-extrabold tracking-tight text-text">Neue Produkte</h1>
+        <h1 className="font-display text-[32px] font-extrabold tracking-[-0.04em] text-text">Neue Produkte</h1>
         {canCreate && (
           <Button onClick={() => navigate('/products/new')}>
             <Plus className="h-4 w-4" strokeWidth={1.5} />
@@ -63,7 +64,7 @@ export default function Products() {
         <button
           onClick={() => setActiveBrand('all')}
           className={cn(
-            'rounded-full px-3 py-1 text-[13px] font-medium transition-colors',
+            'rounded-sm px-3 py-1 text-[13px] font-medium transition-colors',
             activeBrand === 'all' ? 'bg-primary text-white' : 'bg-surface-2 text-text-sub hover:bg-surface'
           )}
         >
@@ -73,11 +74,11 @@ export default function Products() {
           <button
             key={key}
             onClick={() => setActiveBrand(key)}
-            className="rounded-full px-3 py-1 text-[13px] font-medium transition-colors"
+            className="rounded-sm px-3 py-1 text-[13px] font-medium transition-colors"
             style={
               activeBrand === key
-                ? { backgroundColor: config.text, color: '#fff' }
-                : { backgroundColor: config.bg, color: config.text }
+                ? { backgroundColor: config.fg, color: '#fff' }
+                : { backgroundColor: config.bg, color: config.fg }
             }
           >
             {config.label}
@@ -100,9 +101,17 @@ export default function Products() {
           onAction={canCreate ? () => navigate('/products/new') : undefined}
         />
       ) : (
-        <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-          {filtered.map((product) => (
-            <ProductCard key={product.id} product={product} />
+        <div className="columns-1 gap-5 sm:columns-2 lg:columns-3">
+          {filtered.map((product, index) => (
+            <motion.div
+              key={product.id}
+              initial={{ opacity: 0, y: 6 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.1, delay: Math.min(index * 0.035, 0.35) }}
+              className="mb-5 break-inside-avoid"
+            >
+              <ProductCard product={product} />
+            </motion.div>
           ))}
         </div>
       )}

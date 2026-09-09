@@ -76,13 +76,16 @@ export default function ProductNew() {
   }
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center gap-1.5 text-[13px] text-text-muted">
-        <Link to="/products" className="hover:text-text">
-          Neue Produkte
-        </Link>
-        <ChevronRight className="h-3.5 w-3.5" strokeWidth={1.5} />
-        <span className="text-text">Produkt anlegen</span>
+    <div className="space-y-8">
+      <div className="space-y-1.5">
+        <div className="flex items-center gap-1.5 text-[12px] text-text-muted">
+          <Link to="/products" className="hover:text-text">
+            Neue Produkte
+          </Link>
+          <ChevronRight className="h-3.5 w-3.5" strokeWidth={1.5} />
+          <span className="text-text">Produkt anlegen</span>
+        </div>
+        <h1 className="font-display text-[22px] font-bold tracking-[-0.02em] text-text">Produkt anlegen</h1>
       </div>
 
       <Card className="mx-auto max-w-[720px]">

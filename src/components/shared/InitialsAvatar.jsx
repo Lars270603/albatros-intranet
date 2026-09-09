@@ -1,7 +1,14 @@
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar'
-import { cn, hexToRgba } from '@/lib/utils'
+import { cn } from '@/lib/utils'
 
-const AVATAR_COLORS = ['#EF4444', '#3B82F6', '#10B981', '#F59E0B', '#8B5CF6', '#EC4899']
+const AVATAR_COLORS = [
+  'var(--avatar-1)',
+  'var(--avatar-2)',
+  'var(--avatar-3)',
+  'var(--avatar-4)',
+  'var(--avatar-5)',
+  'var(--avatar-6)',
+]
 
 function colorForName(name) {
   let hash = 0
@@ -18,7 +25,7 @@ function initialsFor(firstName, lastName) {
   return `${a}${b}`.toUpperCase() || '?'
 }
 
-export function InitialsAvatar({ firstName, lastName, avatarUrl, size = 32, className, soft = false }) {
+export function InitialsAvatar({ firstName, lastName, avatarUrl, size = 32, className }) {
   const name = `${firstName || ''} ${lastName || ''}`.trim()
   const initials = initialsFor(firstName, lastName)
   const bg = colorForName(name || 'Albatros')
@@ -27,12 +34,7 @@ export function InitialsAvatar({ firstName, lastName, avatarUrl, size = 32, clas
     <Avatar className={cn('shrink-0', className)} style={{ width: size, height: size }}>
       {avatarUrl && <AvatarImage src={avatarUrl} alt={name} />}
       <AvatarFallback
-        style={{
-          background: soft
-            ? `radial-gradient(circle at 35% 30%, ${hexToRgba(bg, 0.85)} 0%, ${hexToRgba(bg, 0.55)} 100%)`
-            : bg,
-          fontSize: size * 0.4,
-        }}
+        style={{ background: bg, fontSize: size * 0.4 }}
         className="text-white"
       >
         {initials}

@@ -73,7 +73,7 @@ export default function Login() {
       <div className="flex flex-1 items-center justify-center p-6">
         <div className="w-full max-w-[360px] space-y-6">
           <div className="space-y-1">
-            <h1 className="font-display text-2xl font-extrabold text-text">Anmelden</h1>
+            <h1 className="font-display text-2xl font-extrabold tracking-[-0.03em] text-text">Anmelden</h1>
             <p className="text-[14px] text-text-sub">Melde dich mit deinem Albatros-Account an.</p>
           </div>
 

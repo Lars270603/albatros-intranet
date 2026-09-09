@@ -3,22 +3,68 @@
 @tailwind utilities;
 
 :root {
-  --bg: #ffffff;
-  --surface: #f8f9fa;
-  --surface-2: #f3f4f6;
-  --border: #e5e7eb;
-  --border-strong: #d1d5db;
-  --text: #111827;
-  --text-sub: #6b7280;
-  --text-muted: #9ca3af;
-  --accent: #dc2626;
-  --accent-hover: #b91c1c;
-  --accent-light: #fef2f2;
-  --success: #16a34a;
-  --success-light: #f0fdf4;
-  --warning: #d97706;
-  --warning-light: #fffbeb;
-  --radius: 8px;
+  /* Neutrale Skala */
+  --bg: oklch(100% 0 0);
+  --surface: oklch(98% 0.002 264);
+  --surface-2: oklch(96% 0.003 264);
+  --border: oklch(90% 0.004 264);
+  --border-strong: oklch(84% 0.006 264);
+  --text: oklch(15% 0.01 264);
+  --text-sub: oklch(45% 0.01 264);
+  --text-muted: oklch(65% 0.008 264);
+
+  /* Akzent — einzige Markenfarbe */
+  --accent: oklch(50% 0.22 27);
+  --accent-hover: oklch(44% 0.22 27);
+  --accent-light: oklch(96% 0.04 27);
+
+  /* Semantische Systemfarben */
+  --success: oklch(52% 0.18 145);
+  --success-light: oklch(96% 0.04 145);
+  --warning: oklch(68% 0.18 65);
+  --warning-light: oklch(96% 0.045 65);
+
+  /* Kategorische Datenfarben — Dateitypen, keine UI-Akzente */
+  --info: oklch(55% 0.18 258);
+  --info-light: oklch(96% 0.03 258);
+  --violet: oklch(55% 0.18 300);
+  --violet-light: oklch(96% 0.03 300);
+
+  /* Marken-Badges (Produktkatalog) — feste Zuordnung je Marke */
+  --brand-arensberger-bg: #dbeafe;
+  --brand-arensberger-fg: #1e40af;
+  --brand-sommertal-bg: #fef3c7;
+  --brand-sommertal-fg: #92400e;
+  --brand-albatros-bg: #fee2e2;
+  --brand-albatros-fg: #991b1b;
+  --brand-ravino-bg: #f3f4f6;
+  --brand-ravino-fg: #374151;
+  --brand-burggraf-bg: #fef9c3;
+  --brand-burggraf-fg: #854d0e;
+  --brand-stahlmann-bg: #1f2937;
+  --brand-stahlmann-fg: #f9fafb;
+
+  /* Abteilungs-Badges */
+  --dept-vertrieb-bg: #ede9fe;
+  --dept-vertrieb-fg: #5b21b6;
+  --dept-einkauf-bg: #cffafe;
+  --dept-einkauf-fg: #155e75;
+  --dept-kundenservice-bg: #dcfce7;
+  --dept-kundenservice-fg: #166534;
+  --dept-geschaeftsfuehrung-bg: #ffe4e6;
+  --dept-geschaeftsfuehrung-fg: #9f1239;
+
+  /* Initialen-Avatare — Hash-basierte Zuordnung */
+  --avatar-1: #ef4444;
+  --avatar-2: #3b82f6;
+  --avatar-3: #10b981;
+  --avatar-4: #f59e0b;
+  --avatar-5: #8b5cf6;
+  --avatar-6: #ec4899;
+
+  --radius-card: 10px;
+  --radius-control: 7px;
+  --radius-badge: 4px;
 }
 
 * {
@@ -34,8 +80,8 @@ body {
   background: var(--bg);
   color: var(--text);
   font-family: 'Geist', sans-serif;
-  font-size: 15px;
-  line-height: 1.6;
+  font-size: 14px;
+  line-height: 1.65;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -52,6 +98,28 @@ pre {
   font-family: 'JetBrains Mono', monospace;
 }
 
+/* Micro-Label — wiederkehrendes Utility für Sub-Labels/Section-Kicker */
+.label-micro {
+  font-family: 'Geist', sans-serif;
+  font-weight: 500;
+  font-size: 11px;
+  line-height: 1;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-sub);
+}
+
+/* Browser-Oberflächen — auch das, was wir nicht selbst zeichnen, trägt das System */
+::selection {
+  background: var(--accent-light);
+  color: var(--accent);
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
 ::-webkit-scrollbar {
   width: 10px;
   height: 10px;
@@ -64,6 +132,22 @@ pre {
 ::-webkit-scrollbar-thumb {
   background: var(--border-strong);
   border-radius: 8px;
+}
+
+/* Zahlen in Tabellen/Listen laufen nicht — feste Ziffernbreite */
+table,
+.tabular-nums {
+  font-variant-numeric: tabular-nums;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }
 
 /* Markdown-Prose für technische Daten (Produkt-Detailseite) */

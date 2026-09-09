@@ -1,6 +1,8 @@
 import { useMemo, useState } from 'react'
+import { motion } from 'motion/react'
 import { Plus, Lightbulb } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs'
 import { EmptyState } from '@/components/shared/EmptyState'
 import { SkeletonCard } from '@/components/shared/SkeletonCard'
 import { IdeaCard } from '@/components/ideas/IdeaCard'
@@ -8,7 +10,6 @@ import { IdeaComposerDialog } from '@/components/ideas/IdeaComposerDialog'
 import { useToast } from '@/components/ui/use-toast'
 import { useAuth } from '@/hooks/useAuth'
 import { useIdeas } from '@/hooks/useIdeas'
-import { cn } from '@/lib/utils'
 
 const VIEWS = [
   { value: 'newest', label: 'Neueste' },
@@ -73,48 +74,49 @@ export default function Ideas() {
         </Button>
       </div>
 
-      <div className="flex flex-wrap gap-2">
-        {VIEWS.map((v) => (
-          <button
-            key={v.value}
-            onClick={() => setView(v.value)}
-            className={cn(
-              'rounded-full px-3 py-1 text-[13px] font-medium transition-colors',
-              view === v.value ? 'bg-primary text-white' : 'bg-surface-2 text-text-sub hover:bg-surface'
-            )}
-          >
-            {v.label}
-          </button>
-        ))}
-      </div>
-
-      {loading ? (
-        <div className="space-y-3">
-          <SkeletonCard />
-          <SkeletonCard />
-        </div>
-      ) : visibleIdeas.length === 0 ? (
-        <EmptyState
-          icon={Lightbulb}
-          title="Noch keine Ideen"
-          description="Reiche die erste Idee ein."
-          actionLabel="Idee einreichen"
-          onAction={() => setComposerOpen(true)}
-        />
-      ) : (
-        <div className="space-y-3">
-          {visibleIdeas.map((idea) => (
-            <IdeaCard
-              key={idea.id}
-              idea={idea}
-              isAdmin={isAdmin}
-              onToggleVote={toggleVote}
-              onUpdateStatus={handleUpdateStatus}
-              onDelete={handleDelete}
-            />
+      <Tabs value={view} onValueChange={setView}>
+        <TabsList>
+          {VIEWS.map((v) => (
+            <TabsTrigger key={v.value} value={v.value}>
+              {v.label}
+            </TabsTrigger>
           ))}
-        </div>
-      )}
+        </TabsList>
+
+        <TabsContent value={view} className="space-y-3">
+          {loading ? (
+            <>
+              <SkeletonCard />
+              <SkeletonCard />
+            </>
+          ) : visibleIdeas.length === 0 ? (
+            <EmptyState
+              icon={Lightbulb}
+              title="Noch keine Ideen"
+              description="Reiche die erste Idee ein."
+              actionLabel="Idee einreichen"
+              onAction={() => setComposerOpen(true)}
+            />
+          ) : (
+            visibleIdeas.map((idea, index) => (
+              <motion.div
+                key={idea.id}
+                initial={{ opacity: 0, y: 6 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.1, ease: 'easeOut', delay: index * 0.035 }}
+              >
+                <IdeaCard
+                  idea={idea}
+                  isAdmin={isAdmin}
+                  onToggleVote={toggleVote}
+                  onUpdateStatus={handleUpdateStatus}
+                  onDelete={handleDelete}
+                />
+              </motion.div>
+            ))
+          )}
+        </TabsContent>
+      </Tabs>
 
       <IdeaComposerDialog open={composerOpen} onOpenChange={setComposerOpen} onSubmit={handleSubmitIdea} />
     </div>

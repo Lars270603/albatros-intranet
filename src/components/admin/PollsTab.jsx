@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { Plus, Trash2, BarChart3, Eye } from 'lucide-react'
+import { motion } from 'motion/react'
 import { Button } from '@/components/ui/button'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import {
@@ -91,8 +92,14 @@ export function PollsTab() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {polls.map((poll) => (
-              <TableRow key={poll.id}>
+            {polls.map((poll, index) => (
+              <motion.tr
+                key={poll.id}
+                className="h-12 border-b border-surface-2 transition-colors hover:bg-surface"
+                initial={{ opacity: 0, y: 6 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.1, ease: 'easeOut', delay: index * 0.035 }}
+              >
                 <TableCell className="font-medium text-text">{poll.question}</TableCell>
                 <TableCell>{SCOPE_LABELS[poll.scope]}</TableCell>
                 <TableCell>
@@ -120,10 +127,7 @@ export function PollsTab() {
                       </AlertDialogHeader>
                       <AlertDialogFooter>
                         <AlertDialogCancel>Abbrechen</AlertDialogCancel>
-                        <AlertDialogAction
-                          onClick={() => handleDelete(poll.id)}
-                          className="bg-destructive text-destructive-foreground hover:bg-red-700"
-                        >
+                        <AlertDialogAction onClick={() => handleDelete(poll.id)}>
                           Löschen
                         </AlertDialogAction>
                       </AlertDialogFooter>
@@ -131,7 +135,7 @@ export function PollsTab() {
                   </AlertDialog>
                   </div>
                 </TableCell>
-              </TableRow>
+              </motion.tr>
             ))}
           </TableBody>
         </Table>

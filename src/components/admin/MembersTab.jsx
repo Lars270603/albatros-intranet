@@ -1,4 +1,5 @@
 import { Trash2 } from 'lucide-react'
+import { motion } from 'motion/react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
@@ -86,11 +87,17 @@ export function MembersTab({ members, onChanged }) {
         </TableRow>
       </TableHeader>
       <TableBody>
-        {members.map((profile) => {
+        {members.map((profile, index) => {
           const isSelf = profile.id === user?.id
           const statusConfig = STATUS_CONFIG[profile.status]
           return (
-            <TableRow key={profile.id}>
+            <motion.tr
+              key={profile.id}
+              className="h-12 border-b border-surface-2 transition-colors hover:bg-surface"
+              initial={{ opacity: 0, y: 6 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.1, ease: 'easeOut', delay: index * 0.035 }}
+            >
               <TableCell>
                 <div className="flex items-center gap-2.5">
                   <InitialsAvatar
@@ -142,10 +149,7 @@ export function MembersTab({ members, onChanged }) {
                       </AlertDialogHeader>
                       <AlertDialogFooter>
                         <AlertDialogCancel>Abbrechen</AlertDialogCancel>
-                        <AlertDialogAction
-                          onClick={() => handleDelete(profile)}
-                          className="bg-destructive text-destructive-foreground hover:bg-red-700"
-                        >
+                        <AlertDialogAction onClick={() => handleDelete(profile)}>
                           Löschen
                         </AlertDialogAction>
                       </AlertDialogFooter>
@@ -153,7 +157,7 @@ export function MembersTab({ members, onChanged }) {
                   </AlertDialog>
                 </div>
               </TableCell>
-            </TableRow>
+            </motion.tr>
           )
         })}
       </TableBody>

@@ -8,6 +8,8 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { Separator } from '@/components/ui/separator'
+import { Label } from '@/components/ui/label'
+import { Skeleton } from '@/components/ui/skeleton'
 import {
   Select,
   SelectContent,
@@ -17,6 +19,7 @@ import {
 } from '@/components/ui/select'
 import { BrandBadge, BRANDS } from '@/components/shared/BrandBadge'
 import { InitialsAvatar } from '@/components/shared/InitialsAvatar'
+import { EmptyState } from '@/components/shared/EmptyState'
 import { ProductQA } from '@/components/products/ProductQA'
 import { useAuth } from '@/hooks/useAuth'
 import { useToast } from '@/components/ui/use-toast'
@@ -79,11 +82,37 @@ export default function ProductDetail() {
   }
 
   if (loading) {
-    return <div className="py-16 text-center text-[14px] text-text-muted">Wird geladen…</div>
+    return (
+      <div className="space-y-12">
+        <Skeleton className="h-4 w-40" />
+        <div className="grid gap-8 md:grid-cols-2">
+          <div className="space-y-3">
+            <Skeleton className="aspect-square w-full rounded-[10px]" />
+            <div className="flex gap-2">
+              <Skeleton className="h-[60px] w-[60px] rounded-md" />
+              <Skeleton className="h-[60px] w-[60px] rounded-md" />
+              <Skeleton className="h-[60px] w-[60px] rounded-md" />
+            </div>
+          </div>
+          <div className="space-y-3">
+            <Skeleton className="h-5 w-20" />
+            <Skeleton className="h-7 w-2/3" />
+            <Skeleton className="h-4 w-full" />
+            <Skeleton className="h-4 w-5/6" />
+          </div>
+        </div>
+      </div>
+    )
   }
 
   if (!product) {
-    return <div className="py-16 text-center text-[14px] text-text-muted">Produkt nicht gefunden.</div>
+    return (
+      <EmptyState
+        icon={Package}
+        title="Produkt nicht gefunden"
+        description="Dieses Produkt existiert nicht oder wurde entfernt."
+      />
+    )
   }
 
   const canEdit = profile?.role === 'admin' || product.created_by === profile?.id
@@ -91,9 +120,9 @@ export default function ProductDetail() {
   const mainImage = images[activeImage]?.image_url
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-12">
       <div className="flex items-center justify-between">
-        <div className="flex items-center gap-1.5 text-[13px] text-text-muted">
+        <div className="flex items-center gap-1.5 text-[12px] text-text-muted">
           <Link to="/products" className="hover:text-text">
             Neue Produkte
           </Link>
@@ -136,8 +165,8 @@ export default function ProductDetail() {
                   key={img.id}
                   onClick={() => setActiveImage(index)}
                   className={cn(
-                    'h-[60px] w-[60px] shrink-0 overflow-hidden rounded-lg border-2',
-                    index === activeImage ? 'border-primary ring-2 ring-primary' : 'border-transparent'
+                    'h-[60px] w-[60px] shrink-0 overflow-hidden rounded-md ring-2 ring-offset-1 transition-[box-shadow] duration-150',
+                    index === activeImage ? 'ring-primary' : 'ring-transparent'
                   )}
                 >
                   <img src={img.image_url} alt="" className="h-full w-full object-cover" />
@@ -149,32 +178,44 @@ export default function ProductDetail() {
 
         <div className="space-y-4">
           {editing ? (
-            <div className="space-y-3">
-              <Select value={form.brand} onValueChange={(v) => setForm((f) => ({ ...f, brand: v }))}>
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {Object.entries(BRANDS).map(([key, config]) => (
-                    <SelectItem key={key} value={key}>
-                      {config.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              <Input value={form.name} onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))} />
-              <Textarea
-                rows={3}
-                value={form.description}
-                onChange={(e) => setForm((f) => ({ ...f, description: e.target.value }))}
-              />
-              <Textarea
-                rows={10}
-                className="font-mono text-[13px]"
-                value={form.specs}
-                onChange={(e) => setForm((f) => ({ ...f, specs: e.target.value }))}
-              />
-              <div className="flex justify-end gap-2">
+            <div className="space-y-4">
+              <div className="space-y-1.5">
+                <Label>Marke</Label>
+                <Select value={form.brand} onValueChange={(v) => setForm((f) => ({ ...f, brand: v }))}>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {Object.entries(BRANDS).map(([key, config]) => (
+                      <SelectItem key={key} value={key}>
+                        {config.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-1.5">
+                <Label>Produktname</Label>
+                <Input value={form.name} onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))} />
+              </div>
+              <div className="space-y-1.5">
+                <Label>Kurzbeschreibung</Label>
+                <Textarea
+                  rows={3}
+                  value={form.description}
+                  onChange={(e) => setForm((f) => ({ ...f, description: e.target.value }))}
+                />
+              </div>
+              <div className="space-y-1.5">
+                <Label>Technische Daten</Label>
+                <Textarea
+                  rows={10}
+                  className="font-mono text-[13px]"
+                  value={form.specs}
+                  onChange={(e) => setForm((f) => ({ ...f, specs: e.target.value }))}
+                />
+              </div>
+              <div className="flex justify-end gap-2 pt-1">
                 <Button variant="secondary" onClick={() => setEditing(false)}>
                   Abbrechen
                 </Button>
@@ -187,7 +228,9 @@ export default function ProductDetail() {
             <>
               <div className="space-y-2">
                 <BrandBadge brand={product.brand} />
-                <h1 className="font-display text-[26px] font-extrabold leading-tight text-text">{product.name}</h1>
+                <h1 className="font-display text-[26px] font-extrabold leading-tight tracking-[-0.03em] text-text">
+                  {product.name}
+                </h1>
                 {product.description && <p className="text-[15px] text-text-sub">{product.description}</p>}
               </div>
 
@@ -195,9 +238,7 @@ export default function ProductDetail() {
                 <>
                   <Separator />
                   <div className="space-y-2">
-                    <p className="text-[12px] font-medium uppercase tracking-[0.08em] text-text-muted">
-                      Technische Daten
-                    </p>
+                    <p className="label-micro">Technische Daten</p>
                     <div className="prose-specs text-[14px] text-text">
                       <ReactMarkdown remarkPlugins={[remarkGfm]}>{product.specs}</ReactMarkdown>
                     </div>

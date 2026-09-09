@@ -1,4 +1,5 @@
 import { CheckCircle } from 'lucide-react'
+import { motion } from 'motion/react'
 import { Button } from '@/components/ui/button'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { EmptyState } from '@/components/shared/EmptyState'
@@ -44,8 +45,14 @@ export function PendingTab({ pending, onChanged }) {
         </TableRow>
       </TableHeader>
       <TableBody>
-        {pending.map((profile) => (
-          <TableRow key={profile.id}>
+        {pending.map((profile, index) => (
+          <motion.tr
+            key={profile.id}
+            className="h-12 border-b border-surface-2 transition-colors hover:bg-surface"
+            initial={{ opacity: 0, y: 6 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.1, ease: 'easeOut', delay: index * 0.035 }}
+          >
             <TableCell className="font-medium text-text">
               {profile.first_name} {profile.last_name}
             </TableCell>
@@ -62,14 +69,14 @@ export function PendingTab({ pending, onChanged }) {
                 <Button
                   variant="outline"
                   size="sm"
-                  className="border-destructive text-destructive hover:bg-primary-light"
+                  className="border-primary text-primary hover:bg-primary-light"
                   onClick={() => handleAction(profile, 'rejected')}
                 >
                   Ablehnen
                 </Button>
               </div>
             </TableCell>
-          </TableRow>
+          </motion.tr>
         ))}
       </TableBody>
     </Table>

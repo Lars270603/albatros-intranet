@@ -25,7 +25,7 @@ import { useToast } from '@/components/ui/use-toast'
 
 function AnswerRow({ answer, canDelete, onDelete }) {
   return (
-    <div className="border-l-2 border-border pl-4">
+    <div className="border-l border-border pl-4">
       <div className="flex items-center gap-2">
         <InitialsAvatar
           firstName={answer.answerer?.first_name}
@@ -39,7 +39,7 @@ function AnswerRow({ answer, canDelete, onDelete }) {
         <RelativeTime date={answer.created_at} className="text-[12px] text-text-muted" />
         {canDelete && (
           <button onClick={() => onDelete(answer.id)} className="ml-auto text-text-muted hover:text-primary">
-            <Trash2 className="h-3.5 w-3.5" strokeWidth={1.5} />
+            <Trash2 className="h-4 w-4" strokeWidth={1.5} />
           </button>
         )}
       </div>
@@ -69,7 +69,7 @@ function QuestionCard({ question, productId, productName, onAnswer, onDeleteQues
   }
 
   return (
-    <div className="space-y-3 rounded-md bg-surface p-4">
+    <div className="space-y-3 rounded-[10px] bg-surface p-5">
       <div className="flex items-start gap-3">
         <InitialsAvatar
           firstName={question.asker?.first_name}
@@ -97,7 +97,7 @@ function QuestionCard({ question, productId, productName, onAnswer, onDeleteQues
               <AlertDialog>
                 <AlertDialogTrigger asChild>
                   <button className="text-text-muted hover:text-primary">
-                    <Trash2 className="h-3.5 w-3.5" strokeWidth={1.5} />
+                    <Trash2 className="h-4 w-4" strokeWidth={1.5} />
                   </button>
                 </AlertDialogTrigger>
                 <AlertDialogContent>

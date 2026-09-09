@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from 'react'
 import { Trash2, Newspaper } from 'lucide-react'
+import { motion } from 'motion/react'
 import { Button } from '@/components/ui/button'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import {
@@ -80,8 +81,14 @@ export function ModerationTab() {
         </TableRow>
       </TableHeader>
       <TableBody>
-        {posts.map((post) => (
-          <TableRow key={post.id}>
+        {posts.map((post, index) => (
+          <motion.tr
+            key={post.id}
+            className="h-12 border-b border-surface-2 transition-colors hover:bg-surface"
+            initial={{ opacity: 0, y: 6 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.1, ease: 'easeOut', delay: index * 0.035 }}
+          >
             <TableCell className="font-medium text-text">{post.title}</TableCell>
             <TableCell>
               {post.author?.first_name} {post.author?.last_name}
@@ -102,17 +109,14 @@ export function ModerationTab() {
                   </AlertDialogHeader>
                   <AlertDialogFooter>
                     <AlertDialogCancel>Abbrechen</AlertDialogCancel>
-                    <AlertDialogAction
-                      onClick={() => handleDelete(post.id)}
-                      className="bg-destructive text-destructive-foreground hover:bg-red-700"
-                    >
+                    <AlertDialogAction onClick={() => handleDelete(post.id)}>
                       Löschen
                     </AlertDialogAction>
                   </AlertDialogFooter>
                 </AlertDialogContent>
               </AlertDialog>
             </TableCell>
-          </TableRow>
+          </motion.tr>
         ))}
       </TableBody>
     </Table>

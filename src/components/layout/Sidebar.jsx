@@ -20,6 +20,12 @@ const NAV_ITEMS = [
   { to: '/team', label: 'Team', icon: Users },
 ]
 
+const NAV_ITEM_CLASS = ({ isActive }) =>
+  cn(
+    'flex h-9 items-center gap-2.5 border-l-2 px-3 text-[13px] transition-colors duration-150',
+    isActive ? 'border-primary font-bold text-text' : 'border-transparent font-normal text-text-muted hover:text-text'
+  )
+
 export function Sidebar({ onNavigate }) {
   const { profile } = useAuth()
   const [pendingCount, setPendingCount] = useState(0)
@@ -45,49 +51,25 @@ export function Sidebar({ onNavigate }) {
 
   return (
     <div className="flex h-full flex-col bg-surface">
-      <div className="flex items-center gap-2.5 px-5 py-5">
-        <img src={albatrosLogo} alt="Albatros" className="h-10 w-10 shrink-0 rounded-md" />
-        <span className="font-display text-[15px] font-bold text-text">Albatros Intranet</span>
+      <div className="flex h-12 items-center gap-2 px-4">
+        <img src={albatrosLogo} alt="Albatros" className="h-7 w-7 shrink-0 rounded-[6px]" />
+        <span className="font-display text-[13px] font-bold tracking-[-0.01em] text-text">Albatros Intranet</span>
       </div>
 
-      <nav className="flex-1 space-y-1 px-3">
+      <nav className="flex-1 space-y-0.5 px-2 pt-2">
         {NAV_ITEMS.map((item) => (
-          <NavLink
-            key={item.to}
-            to={item.to}
-            end={item.end}
-            onClick={onNavigate}
-            className={({ isActive }) =>
-              cn(
-                'flex h-11 items-center gap-3 rounded-md border-l-2 border-transparent px-3 text-[14px] font-normal text-text-sub transition-colors',
-                isActive
-                  ? 'border-primary bg-primary-light font-medium text-primary'
-                  : 'hover:bg-surface-2 hover:text-text'
-              )
-            }
-          >
-            <item.icon className="h-5 w-5" strokeWidth={1.5} />
+          <NavLink key={item.to} to={item.to} end={item.end} onClick={onNavigate} className={NAV_ITEM_CLASS}>
+            <item.icon className="h-[18px] w-[18px]" strokeWidth={1.5} />
             {item.label}
           </NavLink>
         ))}
 
         {profile?.role === 'admin' && (
-          <NavLink
-            to="/admin"
-            onClick={onNavigate}
-            className={({ isActive }) =>
-              cn(
-                'flex h-11 items-center gap-3 rounded-md border-l-2 border-transparent px-3 text-[14px] font-normal text-text-sub transition-colors',
-                isActive
-                  ? 'border-primary bg-primary-light font-medium text-primary'
-                  : 'hover:bg-surface-2 hover:text-text'
-              )
-            }
-          >
-            <Settings className="h-5 w-5" strokeWidth={1.5} />
+          <NavLink to="/admin" onClick={onNavigate} className={NAV_ITEM_CLASS}>
+            <Settings className="h-[18px] w-[18px]" strokeWidth={1.5} />
             Admin
             {pendingCount > 0 && (
-              <span className="ml-auto flex h-5 min-w-[20px] items-center justify-center rounded-full bg-primary px-1 text-[11px] font-medium text-white">
+              <span className="ml-auto flex h-[18px] min-w-[18px] items-center justify-center rounded-[4px] bg-primary px-1 text-[10px] font-medium text-white">
                 {pendingCount}
               </span>
             )}
@@ -95,23 +77,20 @@ export function Sidebar({ onNavigate }) {
         )}
       </nav>
 
-      <div className="flex items-center gap-3 border-t border-border px-4 py-4">
+      <div className="flex items-center gap-2 border-t border-border px-3 py-3">
         <NotificationDropdown />
         <NavLink to="/profile" onClick={onNavigate} className="flex flex-1 items-center gap-2 overflow-hidden">
           <InitialsAvatar
             firstName={profile?.first_name}
             lastName={profile?.last_name}
             avatarUrl={profile?.avatar_url}
-            size={32}
+            size={28}
           />
-          <div className="flex-1 overflow-hidden text-left">
-            <p className="truncate text-[13px] font-medium text-text">
-              {profile?.first_name} {profile?.last_name}
-            </p>
-            <p className="truncate text-[12px] text-text-muted">
-              {DEPARTMENTS[profile?.department]?.label || ''}
-            </p>
-          </div>
+          <p className="flex-1 truncate text-[12px] text-text-sub">
+            <span className="font-medium text-text">{profile?.first_name} {profile?.last_name}</span>
+            {' · '}
+            {DEPARTMENTS[profile?.department]?.label || ''}
+          </p>
         </NavLink>
       </div>
     </div>

@@ -40,9 +40,7 @@ export default function Admin() {
         <TabsList>
           <TabsTrigger value="pending" className="flex items-center gap-2">
             Ausstehende Anfragen
-            {pending.length > 0 && (
-              <Badge className="border-transparent bg-primary text-white">{pending.length}</Badge>
-            )}
+            {pending.length > 0 && <Badge>{pending.length}</Badge>}
           </TabsTrigger>
           <TabsTrigger value="members">Alle Mitarbeiter</TabsTrigger>
           <TabsTrigger value="polls">Umfragen</TabsTrigger>

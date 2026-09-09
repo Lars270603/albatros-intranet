@@ -1,7 +1,6 @@
 import { useState } from 'react'
 import { Pin, Trash2, Download, MessageCircle } from 'lucide-react'
 import { Card } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import {
   AlertDialog,
@@ -20,9 +19,8 @@ import { RelativeTime } from '@/components/shared/RelativeTime'
 import { ReactionBar } from '@/components/feed/ReactionBar'
 import { CommentThread } from '@/components/feed/CommentThread'
 import { FileTypeIcon } from '@/components/documents/FileTypeIcon'
-import { DEPARTMENTS } from '@/components/shared/DepartmentBadge'
 import { useComments } from '@/hooks/useComments'
-import { cn, hexToRgba } from '@/lib/utils'
+import { cn } from '@/lib/utils'
 
 export function PostCard({
   post,
@@ -50,14 +48,15 @@ export function PostCard({
   }
 
   return (
-    <Card
-      className={cn(
-        'overflow-hidden',
-        feature && 'hover:-translate-y-[2px]',
-        pinnedStyle && 'border-l-4 border-l-primary bg-primary-light'
+    <Card className="overflow-hidden">
+      {pinnedStyle && (
+        <div className={cn('flex items-center gap-1.5 pt-4 text-primary label-micro !text-primary', feature ? 'px-6' : 'px-5')}>
+          <Pin className="h-3 w-3 fill-current" strokeWidth={1.5} />
+          Angepinnt
+        </div>
       )}
-    >
-      <div className={cn('flex items-start justify-between gap-3 pb-3', feature ? 'p-6' : 'p-5')}>
+
+      <div className={cn('flex items-start justify-between gap-3 pb-3', feature ? 'p-6' : 'p-5', pinnedStyle && 'pt-2')}>
         <div className="flex items-center gap-3">
           <InitialsAvatar
             firstName={author?.first_name}
@@ -77,12 +76,6 @@ export function PostCard({
         </div>
 
         <div className="flex items-center gap-2">
-          {pinnedStyle && (
-            <Badge className="gap-1 border-transparent bg-primary text-white">
-              <Pin className="h-3 w-3 fill-current" strokeWidth={1.5} />
-              Angepinnt
-            </Badge>
-          )}
           {isAdmin && (
             <>
               <Button
@@ -160,7 +153,7 @@ export function PostCard({
       ) : (
         <div
           className="h-12 w-full"
-          style={{ backgroundColor: hexToRgba(DEPARTMENTS[post.scope]?.text || '#9CA3AF', 0.06) }}
+          style={{ backgroundColor: `var(--dept-${post.scope}-bg, var(--surface-2))` }}
         />
       )}
 

@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { motion } from 'motion/react'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import { BookOpen, Plus, Pencil, Trash2, ArrowUp, ArrowDown } from 'lucide-react'
@@ -64,7 +65,7 @@ export default function Onboarding() {
   return (
     <div className="space-y-6">
       <div className="flex flex-wrap items-start gap-4">
-        <div className="flex flex-1 items-center justify-between gap-6 rounded-xl bg-primary-light px-8 py-8">
+        <div className="flex flex-1 items-center justify-between gap-6 rounded-[10px] bg-primary-light px-8 py-8">
           <div className="space-y-1">
             <h1 className="font-display text-[32px] font-extrabold leading-tight tracking-tight text-text">
               Willkommen bei Albatros
@@ -92,9 +93,18 @@ export default function Onboarding() {
       ) : (
         <div className="space-y-4">
           {sections.map((section, index) => (
-            <Card key={section.id}>
-              <CardHeader className="flex-row items-center justify-between space-y-0">
-                <CardTitle>{section.title}</CardTitle>
+            <motion.div
+              key={section.id}
+              initial={{ opacity: 0, y: 6 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.1, ease: 'easeOut', delay: index * 0.035 }}
+            >
+            <Card>
+              <CardHeader className="flex-row items-start justify-between space-y-0">
+                <div className="space-y-1">
+                  <p className="label-micro">Sektion {String(index + 1).padStart(2, '0')}</p>
+                  <CardTitle>{section.title}</CardTitle>
+                </div>
                 {isAdmin && (
                   <div className="flex items-center gap-1">
                     <Button
@@ -151,6 +161,7 @@ export default function Onboarding() {
                 </div>
               </CardContent>
             </Card>
+            </motion.div>
           ))}
         </div>
       )}

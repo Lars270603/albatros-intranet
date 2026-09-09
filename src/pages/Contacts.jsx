@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
+import { motion } from 'motion/react'
 import { Search, Plus, Phone } from 'lucide-react'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
@@ -111,8 +112,10 @@ export default function Contacts() {
           <button
             onClick={() => setActiveCategory('all')}
             className={cn(
-              'rounded-full px-3 py-1 text-[13px] font-medium transition-colors',
-              activeCategory === 'all' ? 'bg-primary text-white' : 'bg-surface-2 text-text-sub hover:bg-surface'
+              'rounded-[7px] border px-3 py-1.5 text-[13px] font-medium transition-colors',
+              activeCategory === 'all'
+                ? 'border-primary bg-primary-light text-primary'
+                : 'border-border bg-bg text-text-sub hover:border-border-strong hover:text-text'
             )}
           >
             Alle
@@ -121,12 +124,11 @@ export default function Contacts() {
             <button
               key={key}
               onClick={() => setActiveCategory(key)}
-              className="rounded-full px-3 py-1 text-[13px] font-medium transition-colors"
-              style={
-                activeCategory === key
-                  ? { backgroundColor: config.text, color: '#fff' }
-                  : { backgroundColor: config.bg, color: config.text }
-              }
+              className={cn(
+                'rounded-[7px] border px-3 py-1.5 text-[13px] font-medium transition-colors',
+                activeCategory === key ? 'border-transparent' : 'border-transparent opacity-70 hover:opacity-100'
+              )}
+              style={{ backgroundColor: config.bg, color: config.text }}
             >
               {config.label}
             </button>
@@ -160,14 +162,20 @@ export default function Contacts() {
         />
       ) : (
         <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-          {filtered.map((contact) => (
-            <ContactCard
+          {filtered.map((contact, index) => (
+            <motion.div
               key={contact.id}
-              contact={contact}
-              isAdmin={isAdmin}
-              onEdit={openEdit}
-              onDelete={handleDelete}
-            />
+              initial={{ opacity: 0, y: 6 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.1, ease: 'easeOut', delay: index * 0.035 }}
+            >
+              <ContactCard
+                contact={contact}
+                isAdmin={isAdmin}
+                onEdit={openEdit}
+                onDelete={handleDelete}
+              />
+            </motion.div>
           ))}
         </div>
       )}

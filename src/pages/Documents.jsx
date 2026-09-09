@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
+import { motion } from 'motion/react'
 import { Search, Plus, Download, Trash2, Archive } from 'lucide-react'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
@@ -91,9 +92,9 @@ export default function Documents() {
           <button
             onClick={() => setActiveCategory('all')}
             className={cn(
-              'flex w-full items-center rounded-md border-l-2 border-transparent px-3 py-2 text-left text-[14px] transition-colors',
+              'flex w-full items-center rounded-md px-3 py-2 text-left text-[14px] transition-colors',
               activeCategory === 'all'
-                ? 'border-primary bg-primary-light font-medium text-primary'
+                ? 'bg-primary-light font-medium text-primary'
                 : 'text-text-sub hover:bg-surface-2'
             )}
           >
@@ -104,9 +105,9 @@ export default function Documents() {
               key={key}
               onClick={() => setActiveCategory(key)}
               className={cn(
-                'flex w-full items-center rounded-md border-l-2 border-transparent px-3 py-2 text-left text-[14px] transition-colors',
+                'flex w-full items-center rounded-md px-3 py-2 text-left text-[14px] transition-colors',
                 activeCategory === key
-                  ? 'border-primary bg-primary-light font-medium text-primary'
+                  ? 'bg-primary-light font-medium text-primary'
                   : 'text-text-sub hover:bg-surface-2'
               )}
             >
@@ -128,7 +129,7 @@ export default function Documents() {
             </div>
             <Button onClick={() => setUploadOpen(true)}>
               <Plus className="h-4 w-4" strokeWidth={1.5} />
-              Datei hochladen
+              Dokument hochladen
             </Button>
           </div>
 
@@ -142,7 +143,7 @@ export default function Documents() {
               icon={Archive}
               title="Keine Dateien gefunden"
               description="Lade die erste Datei in dieser Kategorie hoch."
-              actionLabel="Datei hochladen"
+              actionLabel="Dokument hochladen"
               onAction={() => setUploadOpen(true)}
             />
           ) : (
@@ -154,14 +155,21 @@ export default function Documents() {
                   <TableHead>Kategorie</TableHead>
                   <TableHead>Uploader</TableHead>
                   <TableHead>Datum</TableHead>
-                  <TableHead className="text-right">Aktionen</TableHead>
+                  <TableHead className="text-right">Download</TableHead>
+                  <TableHead className="text-right">Löschen</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {filtered.map((doc) => {
+                {filtered.map((doc, index) => {
                   const canDelete = profile?.role === 'admin' || doc.uploaded_by === profile?.id
                   return (
-                    <TableRow key={doc.id}>
+                    <motion.tr
+                      key={doc.id}
+                      initial={{ opacity: 0, y: 6 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.1, ease: 'easeOut', delay: index * 0.035 }}
+                      className="h-12 border-b border-surface-2 transition-colors hover:bg-surface"
+                    >
                       <TableCell>
                         <FileTypeIcon fileType={doc.file_type} className="h-5 w-5" />
                       </TableCell>
@@ -175,45 +183,45 @@ export default function Documents() {
                       </TableCell>
                       <TableCell>{formatDate(doc.created_at)}</TableCell>
                       <TableCell className="text-right">
-                        <div className="flex items-center justify-end gap-1">
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            className="h-8 w-8"
-                            onClick={() => window.open(doc.file_url, '_blank')}
-                            title="Herunterladen"
-                          >
-                            <Download className="h-4 w-4" strokeWidth={1.5} />
-                          </Button>
-                          {canDelete && (
-                            <AlertDialog>
-                              <AlertDialogTrigger asChild>
-                                <Button variant="ghost" size="icon" className="h-8 w-8" title="Löschen">
-                                  <Trash2 className="h-4 w-4" strokeWidth={1.5} />
-                                </Button>
-                              </AlertDialogTrigger>
-                              <AlertDialogContent>
-                                <AlertDialogHeader>
-                                  <AlertDialogTitle>Datei löschen?</AlertDialogTitle>
-                                  <AlertDialogDescription>
-                                    „{doc.name}" wird endgültig entfernt.
-                                  </AlertDialogDescription>
-                                </AlertDialogHeader>
-                                <AlertDialogFooter>
-                                  <AlertDialogCancel>Abbrechen</AlertDialogCancel>
-                                  <AlertDialogAction
-                                    onClick={() => handleDelete(doc.id)}
-                                    className="bg-destructive text-destructive-foreground hover:bg-red-700"
-                                  >
-                                    Löschen
-                                  </AlertDialogAction>
-                                </AlertDialogFooter>
-                              </AlertDialogContent>
-                            </AlertDialog>
-                          )}
-                        </div>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-8 w-8"
+                          onClick={() => window.open(doc.file_url, '_blank')}
+                          title="Herunterladen"
+                        >
+                          <Download className="h-4 w-4" strokeWidth={1.5} />
+                        </Button>
                       </TableCell>
-                    </TableRow>
+                      <TableCell className="text-right">
+                        {canDelete && (
+                          <AlertDialog>
+                            <AlertDialogTrigger asChild>
+                              <Button variant="ghost" size="icon" className="h-8 w-8" title="Löschen">
+                                <Trash2 className="h-4 w-4" strokeWidth={1.5} />
+                              </Button>
+                            </AlertDialogTrigger>
+                            <AlertDialogContent>
+                              <AlertDialogHeader>
+                                <AlertDialogTitle>Datei löschen?</AlertDialogTitle>
+                                <AlertDialogDescription>
+                                  „{doc.name}" wird endgültig entfernt.
+                                </AlertDialogDescription>
+                              </AlertDialogHeader>
+                              <AlertDialogFooter>
+                                <AlertDialogCancel>Abbrechen</AlertDialogCancel>
+                                <AlertDialogAction
+                                  onClick={() => handleDelete(doc.id)}
+                                  className="bg-destructive text-destructive-foreground hover:bg-red-700"
+                                >
+                                  Löschen
+                                </AlertDialogAction>
+                              </AlertDialogFooter>
+                            </AlertDialogContent>
+                          </AlertDialog>
+                        )}
+                      </TableCell>
+                    </motion.tr>
                   )
                 })}
               </TableBody>

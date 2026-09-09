@@ -44,11 +44,11 @@ export default function Home() {
   }
 
   return (
-    <div className="space-y-10">
+    <div className="space-y-12">
       <HomeHeader firstName={profile?.first_name} />
 
-      <div className="grid gap-8 md:grid-cols-[65%_1fr]">
-        <div className="min-w-0 space-y-5">
+      <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_360px]">
+        <div className="min-w-0 space-y-4">
           {loading ? (
             <>
               <SkeletonCard />
@@ -80,9 +80,9 @@ export default function Home() {
                 feedPosts.map((post, index) => (
                   <motion.div
                     key={post.id}
-                    initial={{ opacity: 0, y: 12 }}
+                    initial={{ opacity: 0, y: 6 }}
                     animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.2, ease: 'easeOut', delay: index * 0.04 }}
+                    transition={{ duration: 0.1, ease: 'easeOut', delay: index * 0.04 }}
                   >
                     <PostCard
                       post={post}
@@ -100,7 +100,7 @@ export default function Home() {
           )}
         </div>
 
-        <div className="min-w-0 space-y-6">
+        <div className="min-w-0 space-y-4">
           <TeamWidget />
           <PollWidget />
           <ProductsWidget />

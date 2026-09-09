@@ -94,7 +94,7 @@ export function DocumentUploadDialog({ open, onOpenChange, onUploaded }) {
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Datei hochladen</DialogTitle>
+          <DialogTitle>Dokument hochladen</DialogTitle>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-4">

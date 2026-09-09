@@ -23,7 +23,7 @@ export function PollWidget() {
   return (
     <Card>
       <CardHeader className="pb-3">
-        <p className="text-[12px] font-medium uppercase tracking-[0.08em] text-text-muted">Umfrage</p>
+        <p className="label-micro">Umfrage</p>
       </CardHeader>
       <CardContent className="space-y-4">
         <p className="font-display text-[16px] font-bold leading-snug text-text">{poll.question}</p>
@@ -53,9 +53,9 @@ export function PollWidget() {
                     <span className="text-text">{option.label}</span>
                     <span className="font-medium text-text-sub">{pct}%</span>
                   </div>
-                  <div className="h-2 w-full overflow-hidden rounded-full bg-surface-2">
+                  <div className="h-2 w-full overflow-hidden rounded-[4px] bg-surface-2">
                     <div
-                      className={cn('h-full rounded-full', isMine ? 'bg-primary' : 'bg-border-strong')}
+                      className={cn('h-full rounded-[4px]', isMine ? 'bg-primary' : 'bg-text-muted')}
                       style={{ width: `${pct}%` }}
                     />
                   </div>

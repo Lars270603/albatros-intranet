@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react'
+import { motion } from 'motion/react'
 import { Plus, MessageSquare } from 'lucide-react'
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs'
 import { Button } from '@/components/ui/button'
@@ -48,7 +49,7 @@ export default function News() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="max-w-[720px] space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="font-display text-[32px] font-extrabold tracking-tight text-text">News</h1>
         {canPost && (
@@ -68,7 +69,7 @@ export default function News() {
           ))}
         </TabsList>
 
-        <TabsContent value={activeTab} className="space-y-5">
+        <TabsContent value={activeTab} className="space-y-4">
           {loading ? (
             <>
               <SkeletonCard />
@@ -84,17 +85,23 @@ export default function News() {
               onAction={canPost ? () => setComposerOpen(true) : undefined}
             />
           ) : (
-            posts.map((post) => (
-              <PostCard
+            posts.map((post, index) => (
+              <motion.div
                 key={post.id}
-                post={post}
-                reactions={reactions[post.id]}
-                onToggleReaction={toggleReaction}
-                isAdmin={isAdmin}
-                onTogglePin={handleTogglePin}
-                onDelete={handleDelete}
-                pinnedStyle={post.pinned}
-              />
+                initial={{ opacity: 0, y: 6 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.1, ease: 'easeOut', delay: index * 0.035 }}
+              >
+                <PostCard
+                  post={post}
+                  reactions={reactions[post.id]}
+                  onToggleReaction={toggleReaction}
+                  isAdmin={isAdmin}
+                  onTogglePin={handleTogglePin}
+                  onDelete={handleDelete}
+                  pinnedStyle={post.pinned}
+                />
+              </motion.div>
             ))
           )}
         </TabsContent>

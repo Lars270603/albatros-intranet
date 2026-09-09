@@ -101,9 +101,9 @@ export default function PollDetail() {
                     {pct}% · {count} {count === 1 ? 'Stimme' : 'Stimmen'}
                   </span>
                 </div>
-                <div className="h-2 w-full overflow-hidden rounded-full bg-surface-2">
+                <div className="h-2 w-full overflow-hidden rounded-[4px] bg-surface-2">
                   <div
-                    className={cn('h-full rounded-full', isMine ? 'bg-primary' : 'bg-border-strong')}
+                    className={cn('h-full rounded-[4px]', isMine ? 'bg-primary' : 'bg-border-strong')}
                     style={{ width: `${pct}%` }}
                   />
                 </div>

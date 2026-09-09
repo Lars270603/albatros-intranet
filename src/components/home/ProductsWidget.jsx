@@ -14,7 +14,7 @@ export function ProductsWidget() {
   return (
     <Card>
       <CardHeader className="pb-2">
-        <p className="text-[12px] font-medium uppercase tracking-[0.08em] text-text-muted">Neue Produkte</p>
+        <p className="label-micro">Neue Produkte</p>
       </CardHeader>
       <CardContent className="space-y-1">
         {recent.map((product) => {

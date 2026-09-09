@@ -25,7 +25,7 @@ export function Layout() {
       </div>
 
       {/* Desktop Sidebar */}
-      <aside className="fixed inset-y-0 left-0 z-20 hidden w-[240px] border-r border-border md:block">
+      <aside className="fixed inset-y-0 left-0 z-20 hidden w-[220px] border-r border-border md:block">
         <Sidebar />
       </aside>
 
@@ -42,11 +42,11 @@ export function Layout() {
               onClick={() => setDrawerOpen(false)}
             />
             <motion.aside
-              initial={{ x: -240 }}
+              initial={{ x: -220 }}
               animate={{ x: 0 }}
-              exit={{ x: -240 }}
+              exit={{ x: -220 }}
               transition={{ duration: 0.2, ease: 'easeOut' }}
-              className="fixed inset-y-0 left-0 z-50 w-[240px] border-r border-border md:hidden"
+              className="fixed inset-y-0 left-0 z-50 w-[220px] border-r border-border md:hidden"
             >
               <button
                 onClick={() => setDrawerOpen(false)}
@@ -62,15 +62,15 @@ export function Layout() {
       </AnimatePresence>
 
       {/* Content */}
-      <main className="pt-14 md:ml-[240px] md:pt-0">
-        <div className="mx-auto max-w-6xl px-4 py-8 md:px-8">
+      <main className="pt-14 md:ml-[220px] md:pt-0">
+        <div className="mx-auto max-w-[1440px] px-4 py-10 md:px-10">
           <AnimatePresence mode="wait">
             <motion.div
               key={location.pathname}
-              initial={{ opacity: 0, y: 6 }}
+              initial={{ opacity: 0, y: 8 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0 }}
-              transition={{ duration: 0.12 }}
+              transition={{ duration: 0.11, ease: 'easeOut' }}
             >
               <Outlet />
             </motion.div>

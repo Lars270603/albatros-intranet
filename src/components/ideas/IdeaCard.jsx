@@ -1,4 +1,4 @@
-import { ThumbsUp, Trash2 } from 'lucide-react'
+import { ChevronUp, Trash2 } from 'lucide-react'
 import { Card } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -44,12 +44,14 @@ export function IdeaCard({ idea, isAdmin, onToggleVote, onUpdateStatus, onDelete
       <button
         onClick={() => onToggleVote(idea)}
         className={cn(
-          'flex h-16 w-14 shrink-0 flex-col items-center justify-center gap-0.5 rounded-md border transition-colors',
-          myVote ? 'border-primary-light bg-primary-light text-primary' : 'border-border text-text-sub hover:bg-surface'
+          'flex h-14 w-12 shrink-0 flex-col items-center justify-center gap-0.5 rounded-[7px] border transition-colors',
+          myVote
+            ? 'border-primary bg-primary-light text-primary'
+            : 'border-border text-text-sub hover:border-border-strong hover:text-text'
         )}
       >
-        <ThumbsUp className="h-4 w-4" strokeWidth={1.5} fill={myVote ? 'currentColor' : 'none'} />
-        <span className="font-display text-[16px] font-bold">{voteCount}</span>
+        <ChevronUp className="h-4 w-4" strokeWidth={1.5} />
+        <span className="font-display text-[15px] font-bold leading-none">{voteCount}</span>
       </button>
 
       <div className="flex-1 space-y-1.5">

@@ -90,7 +90,7 @@ export default function ResetPassword() {
         ) : done ? (
           <div className="space-y-4 text-center">
             <CheckCircle className="mx-auto h-12 w-12 text-success" strokeWidth={1.5} />
-            <h1 className="font-display text-xl font-bold text-text">Passwort geändert</h1>
+            <h1 className="font-display text-xl font-bold tracking-[-0.02em] text-text">Passwort geändert</h1>
             <p className="text-[14px] text-text-sub">
               Dein Passwort wurde erfolgreich geändert. Du kannst dich jetzt damit anmelden.
             </p>
@@ -102,7 +102,7 @@ export default function ResetPassword() {
           </div>
         ) : !linkValid ? (
           <div className="space-y-4 text-center">
-            <h1 className="font-display text-xl font-bold text-text">Link ungültig</h1>
+            <h1 className="font-display text-xl font-bold tracking-[-0.02em] text-text">Link ungültig</h1>
             <p className="text-[14px] text-text-sub">
               Dieser Reset-Link ist ungültig oder abgelaufen. Bitte fordere über die Anmeldeseite
               einen neuen Link an.
@@ -116,7 +116,7 @@ export default function ResetPassword() {
         ) : (
           <>
             <div className="space-y-1">
-              <h1 className="font-display text-2xl font-extrabold text-text">Neues Passwort setzen</h1>
+              <h1 className="font-display text-2xl font-extrabold tracking-[-0.03em] text-text">Neues Passwort setzen</h1>
               <p className="text-[14px] text-text-sub">Wähle ein neues Passwort für deinen Account.</p>
             </div>
 
