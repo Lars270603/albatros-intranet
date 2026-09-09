@@ -6,6 +6,7 @@ import { ProtectedRoute } from '@/components/layout/ProtectedRoute'
 import { AdminRoute } from '@/components/layout/AdminRoute'
 import Login from '@/pages/Login'
 import Register from '@/pages/Register'
+import ResetPassword from '@/pages/ResetPassword'
 import Home from '@/pages/Home'
 import News from '@/pages/News'
 import Documents from '@/pages/Documents'
@@ -27,6 +28,7 @@ export default function App() {
         <Routes>
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
+          <Route path="/reset-password" element={<ResetPassword />} />
 
           <Route element={<ProtectedRoute />}>
             <Route element={<Layout />}>

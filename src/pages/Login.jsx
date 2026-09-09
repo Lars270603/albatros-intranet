@@ -5,6 +5,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { supabase } from '@/lib/supabase'
 import { useAuth } from '@/hooks/useAuth'
+import { ForgotPasswordDialog } from '@/components/auth/ForgotPasswordDialog'
 import albatrosLogo from '@/assets/albatros-logo.png'
 
 export default function Login() {
@@ -14,6 +15,7 @@ export default function Login() {
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
   const [submitting, setSubmitting] = useState(false)
+  const [forgotPasswordOpen, setForgotPasswordOpen] = useState(false)
 
   async function handleSubmit(e) {
     e.preventDefault()
@@ -89,7 +91,16 @@ export default function Login() {
               />
             </div>
             <div className="space-y-1.5">
-              <Label htmlFor="password">Passwort</Label>
+              <div className="flex items-center justify-between">
+                <Label htmlFor="password">Passwort</Label>
+                <button
+                  type="button"
+                  onClick={() => setForgotPasswordOpen(true)}
+                  className="text-[13px] font-medium text-primary hover:underline"
+                >
+                  Passwort vergessen?
+                </button>
+              </div>
               <Input
                 id="password"
                 type="password"
@@ -120,6 +131,8 @@ export default function Login() {
           </p>
         </div>
       </div>
+
+      <ForgotPasswordDialog open={forgotPasswordOpen} onOpenChange={setForgotPasswordOpen} />
     </div>
   )
 }
