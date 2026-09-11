@@ -3,7 +3,6 @@ import { motion } from 'motion/react'
 import { Button } from '@/components/ui/button'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { EmptyState } from '@/components/shared/EmptyState'
-import { DepartmentBadge } from '@/components/shared/DepartmentBadge'
 import { useToast } from '@/components/ui/use-toast'
 import { supabase } from '@/lib/supabase'
 import { notifyUser } from '@/lib/notifications'
@@ -39,7 +38,6 @@ export function PendingTab({ pending, onChanged }) {
         <TableRow>
           <TableHead>Name</TableHead>
           <TableHead>E-Mail</TableHead>
-          <TableHead>Abteilung</TableHead>
           <TableHead>Registriert am</TableHead>
           <TableHead className="text-right">Aktionen</TableHead>
         </TableRow>
@@ -57,9 +55,6 @@ export function PendingTab({ pending, onChanged }) {
               {profile.first_name} {profile.last_name}
             </TableCell>
             <TableCell>{profile.email}</TableCell>
-            <TableCell>
-              <DepartmentBadge department={profile.department} />
-            </TableCell>
             <TableCell>{formatDate(profile.created_at)}</TableCell>
             <TableCell className="text-right">
               <div className="flex justify-end gap-2">

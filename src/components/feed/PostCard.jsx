@@ -14,7 +14,6 @@ import {
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog'
 import { InitialsAvatar } from '@/components/shared/InitialsAvatar'
-import { DepartmentBadge } from '@/components/shared/DepartmentBadge'
 import { RelativeTime } from '@/components/shared/RelativeTime'
 import { ReactionBar } from '@/components/feed/ReactionBar'
 import { CommentThread } from '@/components/feed/CommentThread'
@@ -69,7 +68,6 @@ export function PostCard({
               <span className="text-[14px] font-medium text-text">
                 {author?.first_name} {author?.last_name}
               </span>
-              <DepartmentBadge department={author?.department} />
             </div>
             <RelativeTime date={post.created_at} className="text-[12px] text-text-muted" />
           </div>

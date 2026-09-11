@@ -115,7 +115,7 @@ export default function ProductDetail() {
     )
   }
 
-  const canEdit = profile?.role === 'admin' || product.created_by === profile?.id
+  const canEdit = profile?.role === 'admin'
   const images = product.product_images
   const mainImage = images[activeImage]?.image_url
 

@@ -1,5 +1,5 @@
 import { useRef, useState } from 'react'
-import { Lock, Camera } from 'lucide-react'
+import { Camera } from 'lucide-react'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -11,7 +11,6 @@ import { useToast } from '@/components/ui/use-toast'
 import { useAuth } from '@/hooks/useAuth'
 import { supabase } from '@/lib/supabase'
 import { uploadFile } from '@/lib/upload'
-import { DEPARTMENTS } from '@/components/shared/DepartmentBadge'
 
 export default function Profile() {
   const { user, profile, refreshProfile } = useAuth()
@@ -21,6 +20,7 @@ export default function Profile() {
   const [firstName, setFirstName] = useState(profile?.first_name || '')
   const [lastName, setLastName] = useState(profile?.last_name || '')
   const [phone, setPhone] = useState(profile?.phone || '')
+  const [extension, setExtension] = useState(profile?.extension || '')
   const [bio, setBio] = useState(profile?.bio || '')
   const [birthday, setBirthday] = useState(profile?.birthday || '')
   const [savingProfile, setSavingProfile] = useState(false)
@@ -59,6 +59,7 @@ export default function Profile() {
           first_name: firstName,
           last_name: lastName,
           phone: phone || null,
+          extension: extension || null,
           bio: bio || null,
           birthday: birthday || null,
         })
@@ -153,17 +154,15 @@ export default function Profile() {
               </div>
             </div>
 
-            <div className="space-y-1.5">
-              <Label>Abteilung</Label>
-              <div className="flex items-center gap-2 rounded-md border border-border bg-surface px-3 py-2 text-[15px] text-text-sub">
-                <Lock className="h-3.5 w-3.5" strokeWidth={1.5} />
-                {DEPARTMENTS[profile?.department]?.label}
+            <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-1.5">
+                <Label htmlFor="phone">Telefon</Label>
+                <Input id="phone" type="tel" value={phone} onChange={(e) => setPhone(e.target.value)} />
               </div>
-            </div>
-
-            <div className="space-y-1.5">
-              <Label htmlFor="phone">Telefon</Label>
-              <Input id="phone" type="tel" value={phone} onChange={(e) => setPhone(e.target.value)} />
+              <div className="space-y-1.5">
+                <Label htmlFor="extension">Durchwahl</Label>
+                <Input id="extension" type="text" value={extension} onChange={(e) => setExtension(e.target.value)} />
+              </div>
             </div>
 
             <div className="space-y-1.5">

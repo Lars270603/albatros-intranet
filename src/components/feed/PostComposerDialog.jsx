@@ -16,7 +16,6 @@ import { useAuth } from '@/hooks/useAuth'
 import { supabase } from '@/lib/supabase'
 import { uploadFile, sanitizeFileName } from '@/lib/upload'
 import { notifyActiveUsers } from '@/lib/notifications'
-import { DEPARTMENTS } from '@/components/shared/DepartmentBadge'
 import { FileTypeIcon } from '@/components/documents/FileTypeIcon'
 
 const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp']
@@ -25,7 +24,7 @@ const MAX_SIZE = 5 * 1024 * 1024
 const ALLOWED_DOC_EXTENSIONS = ['pdf', 'xlsx', 'docx', 'pptx', 'zip']
 const MAX_DOC_SIZE = 20 * 1024 * 1024
 
-export function PostComposerDialog({ open, onOpenChange, scope, onCreated }) {
+export function PostComposerDialog({ open, onOpenChange, onCreated }) {
   const { user } = useAuth()
   const { toast } = useToast()
   const fileInputRef = useRef(null)
@@ -89,7 +88,7 @@ export function PostComposerDialog({ open, onOpenChange, scope, onCreated }) {
 
       const { data: post, error } = await supabase
         .from('news_posts')
-        .insert({ title, body, image_url: imageUrl, scope, author_id: user.id })
+        .insert({ title, body, image_url: imageUrl, scope: 'general', author_id: user.id })
         .select('*, author:profiles(*)')
         .single()
       if (error) throw error
@@ -104,12 +103,10 @@ export function PostComposerDialog({ open, onOpenChange, scope, onCreated }) {
         if (attachError) throw attachError
       }
 
-      const scopeLabel = scope === 'general' ? 'Allgemein' : DEPARTMENTS[scope]?.label || scope
       await notifyActiveUsers({
-        department: scope === 'general' ? null : scope,
         excludeUserId: user.id,
         type: 'new_post',
-        message: `Neuer Beitrag in ${scopeLabel}: ${title}`,
+        message: `Neuer Beitrag: ${title}`,
         refId: post.id,
       })
 

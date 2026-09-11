@@ -1,35 +1,31 @@
 import { useMemo, useState } from 'react'
 import { motion } from 'motion/react'
 import { Plus, MessageSquare } from 'lucide-react'
-import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs'
 import { Button } from '@/components/ui/button'
 import { PostCard } from '@/components/feed/PostCard'
 import { PostComposerDialog } from '@/components/feed/PostComposerDialog'
+import { ActivePollCard } from '@/components/news/ActivePollCard'
 import { SkeletonCard } from '@/components/shared/SkeletonCard'
 import { EmptyState } from '@/components/shared/EmptyState'
 import { useAuth } from '@/hooks/useAuth'
 import { usePosts } from '@/hooks/usePosts'
+import { useActivePoll } from '@/hooks/usePoll'
 import { useToast } from '@/components/ui/use-toast'
 
-const TABS = [
-  { value: 'general', label: 'Allgemein' },
-  { value: 'vertrieb', label: 'Vertrieb' },
-  { value: 'einkauf', label: 'Einkauf' },
-  { value: 'kundenservice', label: 'Kundenservice' },
-  { value: 'geschaeftsfuehrung', label: 'Geschäftsführung' },
-]
+const SCOPES = ['general']
 
 export default function News() {
   const { profile } = useAuth()
   const { toast } = useToast()
-  const [activeTab, setActiveTab] = useState('general')
   const [composerOpen, setComposerOpen] = useState(false)
 
-  const scopes = useMemo(() => [activeTab], [activeTab])
-  const { posts, reactions, loading, toggleReaction, togglePin, deletePost } = usePosts(scopes)
+  const { posts, reactions, loading, toggleReaction, togglePin, deletePost } = usePosts(SCOPES)
+  const { poll, votes, myVote, castVote } = useActivePoll(SCOPES)
 
   const isAdmin = profile?.role === 'admin'
-  const canPost = activeTab === 'general' || activeTab === profile?.department
+
+  const pinnedPosts = useMemo(() => posts.filter((p) => p.pinned), [posts])
+  const restPosts = useMemo(() => posts.filter((p) => !p.pinned), [posts])
 
   async function handleDelete(postId) {
     try {
@@ -52,40 +48,22 @@ export default function News() {
     <div className="max-w-[720px] space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="font-display text-[32px] font-extrabold tracking-tight text-text">News</h1>
-        {canPost && (
-          <Button onClick={() => setComposerOpen(true)}>
-            <Plus className="h-4 w-4" strokeWidth={1.5} />
-            Beitrag erstellen
-          </Button>
-        )}
+        <Button onClick={() => setComposerOpen(true)}>
+          <Plus className="h-4 w-4" strokeWidth={1.5} />
+          Beitrag erstellen
+        </Button>
       </div>
 
-      <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <TabsList>
-          {TABS.map((tab) => (
-            <TabsTrigger key={tab.value} value={tab.value}>
-              {tab.label}
-            </TabsTrigger>
-          ))}
-        </TabsList>
-
-        <TabsContent value={activeTab} className="space-y-4">
-          {loading ? (
-            <>
-              <SkeletonCard />
-              <SkeletonCard />
-              <SkeletonCard />
-            </>
-          ) : posts.length === 0 ? (
-            <EmptyState
-              icon={MessageSquare}
-              title="Noch keine Beiträge in diesem Channel"
-              description={canPost ? 'Erstelle den ersten Beitrag.' : 'Schau später noch einmal vorbei.'}
-              actionLabel={canPost ? 'Beitrag erstellen' : undefined}
-              onAction={canPost ? () => setComposerOpen(true) : undefined}
-            />
-          ) : (
-            posts.map((post, index) => (
+      <div className="space-y-4">
+        {loading ? (
+          <>
+            <SkeletonCard />
+            <SkeletonCard />
+            <SkeletonCard />
+          </>
+        ) : (
+          <>
+            {pinnedPosts.map((post, index) => (
               <motion.div
                 key={post.id}
                 initial={{ opacity: 0, y: 6 }}
@@ -99,18 +77,47 @@ export default function News() {
                   isAdmin={isAdmin}
                   onTogglePin={handleTogglePin}
                   onDelete={handleDelete}
-                  pinnedStyle={post.pinned}
+                  pinnedStyle
                 />
               </motion.div>
-            ))
-          )}
-        </TabsContent>
-      </Tabs>
+            ))}
+
+            {poll && <ActivePollCard poll={poll} votes={votes} myVote={myVote} onVote={castVote} />}
+
+            {pinnedPosts.length === 0 && restPosts.length === 0 ? (
+              <EmptyState
+                icon={MessageSquare}
+                title="Noch keine Beiträge"
+                description="Erstelle den ersten Beitrag."
+                actionLabel="Beitrag erstellen"
+                onAction={() => setComposerOpen(true)}
+              />
+            ) : (
+              restPosts.map((post, index) => (
+                <motion.div
+                  key={post.id}
+                  initial={{ opacity: 0, y: 6 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.1, ease: 'easeOut', delay: index * 0.035 }}
+                >
+                  <PostCard
+                    post={post}
+                    reactions={reactions[post.id]}
+                    onToggleReaction={toggleReaction}
+                    isAdmin={isAdmin}
+                    onTogglePin={handleTogglePin}
+                    onDelete={handleDelete}
+                  />
+                </motion.div>
+              ))
+            )}
+          </>
+        )}
+      </div>
 
       <PostComposerDialog
         open={composerOpen}
         onOpenChange={setComposerOpen}
-        scope={activeTab}
         onCreated={() => {}}
       />
     </div>

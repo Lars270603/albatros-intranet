@@ -16,7 +16,6 @@ import {
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog'
 import { InitialsAvatar } from '@/components/shared/InitialsAvatar'
-import { DepartmentBadge } from '@/components/shared/DepartmentBadge'
 import { RelativeTime } from '@/components/shared/RelativeTime'
 import { EmptyState } from '@/components/shared/EmptyState'
 import { useAuth } from '@/hooks/useAuth'
@@ -82,7 +81,6 @@ function QuestionCard({ question, productId, productName, onAnswer, onDeleteQues
             <span className="text-[14px] font-medium text-text">
               {question.asker?.first_name} {question.asker?.last_name}
             </span>
-            <DepartmentBadge department={question.asker?.department} />
             <RelativeTime date={question.created_at} className="text-[12px] text-text-muted" />
           </div>
           <p className="text-[15px] text-text">{question.body}</p>

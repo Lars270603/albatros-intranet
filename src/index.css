@@ -44,16 +44,6 @@
   --brand-stahlmann-bg: #1f2937;
   --brand-stahlmann-fg: #f9fafb;
 
-  /* Abteilungs-Badges */
-  --dept-vertrieb-bg: #ede9fe;
-  --dept-vertrieb-fg: #5b21b6;
-  --dept-einkauf-bg: #cffafe;
-  --dept-einkauf-fg: #155e75;
-  --dept-kundenservice-bg: #dcfce7;
-  --dept-kundenservice-fg: #166534;
-  --dept-geschaeftsfuehrung-bg: #ffe4e6;
-  --dept-geschaeftsfuehrung-fg: #9f1239;
-
   /* Initialen-Avatare — Hash-basierte Zuordnung */
   --avatar-1: #ef4444;
   --avatar-2: #3b82f6;
@@ -189,4 +179,42 @@ table,
 
 .prose-specs strong {
   font-weight: 700;
+}
+
+/* Leitfaden — nummerierte Listen im Artikel-Body werden zu Schritt-Kacheln */
+.leitfaden-steps {
+  counter-reset: step;
+  list-style: none;
+  margin: 16px 0;
+  padding-left: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.leitfaden-step {
+  counter-increment: step;
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  padding: 16px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--surface);
+}
+
+.leitfaden-step::before {
+  content: counter(step);
+  flex-shrink: 0;
+  width: 28px;
+  height: 28px;
+  border-radius: 999px;
+  background: var(--accent);
+  color: white;
+  font-weight: 700;
+  font-size: 13px;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }

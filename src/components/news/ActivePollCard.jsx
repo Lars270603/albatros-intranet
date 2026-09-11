@@ -1,24 +1,29 @@
-import { useMemo } from 'react'
 import { Link } from 'react-router-dom'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import { useActivePoll } from '@/hooks/usePoll'
-import { useAuth } from '@/hooks/useAuth'
-import { daysUntil } from '@/lib/dateUtils'
+import { useToast } from '@/components/ui/use-toast'
+import { formatDate } from '@/lib/dateUtils'
 import { cn } from '@/lib/utils'
 
-export function PollWidget() {
-  const { profile } = useAuth()
-  const scopes = useMemo(
-    () => (profile ? ['general', profile.department] : ['general']),
-    [profile]
-  )
-  const { poll, votes, myVote, loading, castVote } = useActivePoll(scopes)
+/**
+ * Zeigt die aktive Umfrage oben im News-Feed. Bleibt nach dem Abstimmen
+ * sichtbar und zeigt dann die Ergebnisbalken statt zu verschwinden.
+ */
+export function ActivePollCard({ poll, votes = [], myVote = null, onVote }) {
+  const { toast } = useToast()
 
-  if (loading || !poll) return null
+  if (!poll) return null
 
   const options = poll.options || []
   const totalVotes = votes.length
+
+  async function handleVote(optionId) {
+    try {
+      await onVote?.(optionId)
+    } catch {
+      toast({ variant: 'destructive', title: 'Fehler', description: 'Stimme konnte nicht gespeichert werden.' })
+    }
+  }
 
   return (
     <Card>
@@ -26,7 +31,7 @@ export function PollWidget() {
         <p className="label-micro">Umfrage</p>
       </CardHeader>
       <CardContent className="space-y-4">
-        <p className="font-display text-[16px] font-bold leading-snug text-text">{poll.question}</p>
+        <p className="font-display text-[17px] font-bold leading-snug text-text">{poll.question}</p>
 
         {!myVote ? (
           <div className="space-y-2">
@@ -35,7 +40,7 @@ export function PollWidget() {
                 key={option.id}
                 variant="outline"
                 className="w-full justify-start"
-                onClick={() => castVote(option.id)}
+                onClick={() => handleVote(option.id)}
               >
                 {option.label}
               </Button>
@@ -51,7 +56,9 @@ export function PollWidget() {
                 <div key={option.id} className="space-y-1.5">
                   <div className="flex items-center justify-between text-[13px]">
                     <span className="text-text">{option.label}</span>
-                    <span className="font-medium text-text-sub">{pct}%</span>
+                    <span className="font-medium text-text-sub">
+                      {pct}% · {count} {count === 1 ? 'Stimme' : 'Stimmen'}
+                    </span>
                   </div>
                   <div className="h-2 w-full overflow-hidden rounded-[4px] bg-surface-2">
                     <div
@@ -66,13 +73,11 @@ export function PollWidget() {
         )}
 
         <div className="flex items-center justify-between pt-1">
-          {poll.expires_at ? (
-            <p className="text-[12px] text-text-muted">Endet in {daysUntil(poll.expires_at)} Tagen</p>
-          ) : (
-            <span />
-          )}
+          <p className="text-[12px] text-text-muted">
+            {poll.expires_at ? `Endet am ${formatDate(poll.expires_at)}` : 'Kein Ablaufdatum'}
+          </p>
           <Link to={`/polls/${poll.id}`} className="text-[12px] font-medium text-primary hover:underline">
-            Details
+            Details ansehen
           </Link>
         </div>
       </CardContent>

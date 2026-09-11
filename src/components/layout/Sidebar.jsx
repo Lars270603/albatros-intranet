@@ -1,11 +1,10 @@
 import { NavLink } from 'react-router-dom'
-import { Home, Newspaper, Archive, Package, BookOpen, Phone, Lightbulb, Users, Settings } from 'lucide-react'
+import { Home, Newspaper, Archive, Package, Compass, Users, Settings } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { InitialsAvatar } from '@/components/shared/InitialsAvatar'
 import { NotificationDropdown } from '@/components/layout/NotificationDropdown'
 import { useAuth } from '@/hooks/useAuth'
 import { supabase } from '@/lib/supabase'
-import { DEPARTMENTS } from '@/components/shared/DepartmentBadge'
 import { cn } from '@/lib/utils'
 import albatrosLogo from '@/assets/albatros-logo.png'
 
@@ -14,9 +13,7 @@ const NAV_ITEMS = [
   { to: '/news', label: 'News', icon: Newspaper },
   { to: '/documents', label: 'Archiv', icon: Archive },
   { to: '/products', label: 'Neue Produkte', icon: Package },
-  { to: '/onboarding', label: 'Onboarding', icon: BookOpen },
-  { to: '/contacts', label: 'Kontakte', icon: Phone },
-  { to: '/ideas', label: 'Ideen', icon: Lightbulb },
+  { to: '/leitfaden', label: 'Leitfaden', icon: Compass },
   { to: '/team', label: 'Team', icon: Users },
 ]
 
@@ -86,10 +83,8 @@ export function Sidebar({ onNavigate }) {
             avatarUrl={profile?.avatar_url}
             size={28}
           />
-          <p className="flex-1 truncate text-[12px] text-text-sub">
-            <span className="font-medium text-text">{profile?.first_name} {profile?.last_name}</span>
-            {' · '}
-            {DEPARTMENTS[profile?.department]?.label || ''}
+          <p className="flex-1 truncate text-[12px] font-medium text-text">
+            {profile?.first_name} {profile?.last_name}
           </p>
         </NavLink>
       </div>

@@ -4,14 +4,15 @@ create table if not exists profiles (
   first_name text not null,
   last_name text not null,
   email text not null,
-  department text not null
-    check (department in ('vertrieb','einkauf','kundenservice','geschaeftsfuehrung')),
+  department text
+    check (department is null or department in ('vertrieb','einkauf','kundenservice','geschaeftsfuehrung')),
   role text not null default 'member'
     check (role in ('admin','member')),
   status text not null default 'pending'
     check (status in ('pending','active','rejected')),
   avatar_url text,
   phone text,
+  extension text,
   bio text check (char_length(bio) <= 120),
   birthday date,
   created_at timestamptz default now()
@@ -335,3 +336,57 @@ alter table news_comments enable row level security;
 create policy "nc_select" on news_comments for select using (auth.uid() is not null);
 create policy "nc_insert" on news_comments for insert with check (auth.uid() = author_id);
 create policy "nc_delete" on news_comments for delete using (auth.uid() = author_id);
+
+-- ============================================================
+-- UPDATE v3 (siehe supabase/migrations/004_update_v3.sql)
+-- Leitfaden (ersetzt Onboarding), Firmenkalender, Durchwahl,
+-- Abteilung optional (Registrierung fragt sie nicht mehr ab)
+-- ============================================================
+
+-- Kalender-Termine
+create table if not exists calendar_events (
+  id uuid default gen_random_uuid() primary key,
+  title text not null,
+  event_date date not null,
+  created_by uuid references profiles(id) on delete cascade not null,
+  created_at timestamptz default now()
+);
+alter table calendar_events enable row level security;
+create policy "calendar_events_select" on calendar_events for select using (auth.uid() is not null);
+create policy "calendar_events_insert" on calendar_events for insert with check (auth.uid() = created_by);
+create policy "calendar_events_delete_own" on calendar_events for delete using (auth.uid() = created_by);
+
+-- Leitfaden: Kategorien
+create table if not exists leitfaden_categories (
+  id uuid default gen_random_uuid() primary key,
+  name text not null,
+  icon text not null default 'BookOpen',
+  sort_order int default 0,
+  created_at timestamptz default now()
+);
+alter table leitfaden_categories enable row level security;
+create policy "leitfaden_categories_select" on leitfaden_categories for select using (auth.uid() is not null);
+create policy "leitfaden_categories_insert" on leitfaden_categories for insert with check (auth.uid() is not null);
+create policy "leitfaden_categories_update" on leitfaden_categories for update using (auth.uid() is not null);
+create policy "leitfaden_categories_delete" on leitfaden_categories for delete using (auth.uid() is not null);
+
+-- Leitfaden: Artikel
+create table if not exists leitfaden_articles (
+  id uuid default gen_random_uuid() primary key,
+  category_id uuid references leitfaden_categories(id) on delete cascade not null,
+  title text not null,
+  short_description text,
+  icon text not null default 'FileText',
+  external_link_label text,
+  external_link_url text,
+  info_tiles jsonb not null default '[]'::jsonb,
+  body text not null default '',
+  sort_order int default 0,
+  created_by uuid references profiles(id) on delete set null,
+  updated_at timestamptz default now()
+);
+alter table leitfaden_articles enable row level security;
+create policy "leitfaden_articles_select" on leitfaden_articles for select using (auth.uid() is not null);
+create policy "leitfaden_articles_insert" on leitfaden_articles for insert with check (auth.uid() is not null);
+create policy "leitfaden_articles_update" on leitfaden_articles for update using (auth.uid() is not null);
+create policy "leitfaden_articles_delete" on leitfaden_articles for delete using (auth.uid() is not null);

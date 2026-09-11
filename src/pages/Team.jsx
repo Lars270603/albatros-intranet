@@ -1,11 +1,10 @@
 import { useEffect, useState } from 'react'
-import { Mail, Phone, Users } from 'lucide-react'
+import { Mail, Phone, Hash, Users } from 'lucide-react'
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { SkeletonCard } from '@/components/shared/SkeletonCard'
 import { EmptyState } from '@/components/shared/EmptyState'
 import { InitialsAvatar } from '@/components/shared/InitialsAvatar'
-import { DepartmentBadge } from '@/components/shared/DepartmentBadge'
 import { supabase } from '@/lib/supabase'
 
 export default function Team() {
@@ -62,7 +61,6 @@ export default function Team() {
                 <p className="font-display text-[16px] font-bold text-text">
                   {member.first_name} {member.last_name}
                 </p>
-                <DepartmentBadge department={member.department} />
                 {member.role === 'admin' && (
                   <Badge className="border-transparent bg-primary text-white">Admin</Badge>
                 )}
@@ -82,6 +80,12 @@ export default function Team() {
                       <Phone className="h-3.5 w-3.5" strokeWidth={1.5} />
                       {member.phone}
                     </a>
+                  )}
+                  {member.extension && (
+                    <p className="flex items-center justify-center gap-1.5 text-[13px] text-text-sub">
+                      <Hash className="h-3.5 w-3.5" strokeWidth={1.5} />
+                      Durchwahl: {member.extension}
+                    </p>
                   )}
                 </div>
                 {member.bio && (

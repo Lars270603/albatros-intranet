@@ -10,25 +10,10 @@ import {
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 import { useToast } from '@/components/ui/use-toast'
 import { useAuth } from '@/hooks/useAuth'
 import { supabase } from '@/lib/supabase'
-
-const SCOPES = [
-  { value: 'general', label: 'Allgemein' },
-  { value: 'vertrieb', label: 'Vertrieb' },
-  { value: 'einkauf', label: 'Einkauf' },
-  { value: 'kundenservice', label: 'Kundenservice' },
-  { value: 'geschaeftsfuehrung', label: 'Geschäftsführung' },
-]
 
 export function PollCreateDialog({ open, onOpenChange, onCreated }) {
   const { user } = useAuth()
@@ -36,7 +21,6 @@ export function PollCreateDialog({ open, onOpenChange, onCreated }) {
 
   const [question, setQuestion] = useState('')
   const [options, setOptions] = useState(['', ''])
-  const [scope, setScope] = useState('general')
   const [expiresAt, setExpiresAt] = useState('')
   const [isAnonymous, setIsAnonymous] = useState(false)
   const [submitting, setSubmitting] = useState(false)
@@ -44,7 +28,6 @@ export function PollCreateDialog({ open, onOpenChange, onCreated }) {
   function reset() {
     setQuestion('')
     setOptions(['', ''])
-    setScope('general')
     setExpiresAt('')
     setIsAnonymous(false)
   }
@@ -77,7 +60,7 @@ export function PollCreateDialog({ open, onOpenChange, onCreated }) {
       const { error } = await supabase.from('polls').insert({
         question,
         options: optionObjects,
-        scope,
+        scope: 'general',
         created_by: user.id,
         expires_at: expiresAt ? new Date(expiresAt).toISOString() : null,
         is_anonymous: isAnonymous,
@@ -136,22 +119,6 @@ export function PollCreateDialog({ open, onOpenChange, onCreated }) {
                 Option hinzufügen
               </Button>
             )}
-          </div>
-
-          <div className="space-y-1.5">
-            <Label htmlFor="poll-scope">Zielgruppe</Label>
-            <Select value={scope} onValueChange={setScope}>
-              <SelectTrigger id="poll-scope">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {SCOPES.map((s) => (
-                  <SelectItem key={s.value} value={s.value}>
-                    {s.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
           </div>
 
           <div className="space-y-1.5">

@@ -22,7 +22,6 @@ import {
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog'
 import { InitialsAvatar } from '@/components/shared/InitialsAvatar'
-import { DepartmentBadge } from '@/components/shared/DepartmentBadge'
 import { useToast } from '@/components/ui/use-toast'
 import { useAuth } from '@/hooks/useAuth'
 import { supabase } from '@/lib/supabase'
@@ -80,7 +79,6 @@ export function MembersTab({ members, onChanged }) {
         <TableRow>
           <TableHead>Name</TableHead>
           <TableHead>E-Mail</TableHead>
-          <TableHead>Abteilung</TableHead>
           <TableHead>Rolle</TableHead>
           <TableHead>Status</TableHead>
           <TableHead className="text-right">Aktionen</TableHead>
@@ -112,9 +110,6 @@ export function MembersTab({ members, onChanged }) {
                 </div>
               </TableCell>
               <TableCell>{profile.email}</TableCell>
-              <TableCell>
-                <DepartmentBadge department={profile.department} />
-              </TableCell>
               <TableCell>
                 <Select value={profile.role} onValueChange={(v) => updateRole(profile, v)} disabled={isSelf}>
                   <SelectTrigger className="h-8 w-28">

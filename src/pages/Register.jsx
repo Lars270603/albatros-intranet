@@ -4,15 +4,7 @@ import { CheckCircle } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
 import { supabase } from '@/lib/supabase'
-import { DEPARTMENTS } from '@/components/shared/DepartmentBadge'
 import albatrosLogo from '@/assets/albatros-logo.png'
 
 export default function Register() {
@@ -20,7 +12,6 @@ export default function Register() {
   const [lastName, setLastName] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
-  const [department, setDepartment] = useState('')
   const [error, setError] = useState('')
   const [submitting, setSubmitting] = useState(false)
   const [registered, setRegistered] = useState(false)
@@ -29,10 +20,6 @@ export default function Register() {
     e.preventDefault()
     setError('')
 
-    if (!department) {
-      setError('Bitte wähle deine Abteilung aus.')
-      return
-    }
     if (password.length < 8) {
       setError('Das Passwort muss mindestens 8 Zeichen lang sein.')
       return
@@ -44,7 +31,7 @@ export default function Register() {
         email,
         password,
         options: {
-          data: { first_name: firstName, last_name: lastName, department },
+          data: { first_name: firstName, last_name: lastName },
         },
       })
       if (signUpError) throw signUpError
@@ -136,22 +123,6 @@ export default function Register() {
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="name@albatros-international.de"
               />
-            </div>
-
-            <div className="space-y-1.5">
-              <Label htmlFor="department">Abteilung</Label>
-              <Select value={department} onValueChange={setDepartment}>
-                <SelectTrigger id="department">
-                  <SelectValue placeholder="Abteilung wählen" />
-                </SelectTrigger>
-                <SelectContent>
-                  {Object.entries(DEPARTMENTS).map(([key, config]) => (
-                    <SelectItem key={key} value={key}>
-                      {config.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
             </div>
 
             <div className="space-y-1.5">

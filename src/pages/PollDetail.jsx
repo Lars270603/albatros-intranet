@@ -13,7 +13,6 @@ import {
 } from '@/components/ui/table'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { InitialsAvatar } from '@/components/shared/InitialsAvatar'
-import { DepartmentBadge } from '@/components/shared/DepartmentBadge'
 import { usePollById } from '@/hooks/usePollById'
 import { formatDate, formatDateTime, daysUntil } from '@/lib/dateUtils'
 import { cn } from '@/lib/utils'
@@ -134,7 +133,6 @@ export default function PollDetail() {
                               <p className="text-[13px] font-medium text-text">
                                 {v.voter?.first_name} {v.voter?.last_name}
                               </p>
-                              <DepartmentBadge department={v.voter?.department} />
                             </div>
                           </div>
                         </PopoverContent>
@@ -164,7 +162,6 @@ export default function PollDetail() {
             <TableHeader>
               <TableRow>
                 <TableHead>Name</TableHead>
-                <TableHead>Abteilung</TableHead>
                 <TableHead>Gewählte Option</TableHead>
                 <TableHead>Abgestimmt am</TableHead>
               </TableRow>
@@ -174,9 +171,6 @@ export default function PollDetail() {
                 <TableRow key={v.id}>
                   <TableCell className="font-medium text-text">
                     {v.voter?.first_name} {v.voter?.last_name}
-                  </TableCell>
-                  <TableCell>
-                    <DepartmentBadge department={v.voter?.department} />
                   </TableCell>
                   <TableCell>{options.find((o) => o.id === v.option_id)?.label}</TableCell>
                   <TableCell>{formatDateTime(v.created_at)}</TableCell>
