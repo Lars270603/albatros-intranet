@@ -46,7 +46,8 @@ function buildMonthGrid(viewDate) {
 }
 
 export function CompanyCalendar() {
-  const { user } = useAuth()
+  const { profile } = useAuth()
+  const isAdmin = profile?.role === 'admin'
   const { toast } = useToast()
   const { events, addEvent, deleteEvent } = useCalendarEvents()
   const [birthdays, setBirthdays] = useState([])
@@ -184,22 +185,24 @@ export function CompanyCalendar() {
           <p className="text-[13px] font-medium text-text">
             {selectedDate.toLocaleDateString('de-DE', { weekday: 'long', day: 'numeric', month: 'long' })}
           </p>
-          <Button size="sm" variant="outline" onClick={() => setAddOpen(true)}>
-            <Plus className="h-3.5 w-3.5" strokeWidth={1.5} />
-            Termin hinzufügen
-          </Button>
+          {isAdmin && (
+            <Button size="sm" variant="outline" onClick={() => setAddOpen(true)}>
+              <Plus className="h-3.5 w-3.5" strokeWidth={1.5} />
+              Termin hinzufügen
+            </Button>
+          )}
         </div>
 
         <div className="mt-3 space-y-1.5">
           {selectedBirthdays.map((p) => (
             <p key={p.id} className="text-[13px] text-text-sub">
-              🎂 {p.first_name} {p.last_name} hat Geburtstag
+              🎂 {p.first_name} Geburtstag
             </p>
           ))}
           {selectedEvents.map((ev) => (
             <div key={ev.id} className="flex items-center justify-between text-[13px] text-text">
               <span>{ev.title}</span>
-              {ev.created_by === user?.id && (
+              {isAdmin && (
                 <button onClick={() => handleDeleteEvent(ev.id)} className="text-text-muted hover:text-primary">
                   <Trash2 className="h-3.5 w-3.5" strokeWidth={1.5} />
                 </button>

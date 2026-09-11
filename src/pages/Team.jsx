@@ -5,11 +5,13 @@ import { Badge } from '@/components/ui/badge'
 import { SkeletonCard } from '@/components/shared/SkeletonCard'
 import { EmptyState } from '@/components/shared/EmptyState'
 import { InitialsAvatar } from '@/components/shared/InitialsAvatar'
+import { MemberDetailDialog } from '@/components/team/MemberDetailDialog'
 import { supabase } from '@/lib/supabase'
 
 export default function Team() {
   const [members, setMembers] = useState([])
   const [loading, setLoading] = useState(true)
+  const [selectedMember, setSelectedMember] = useState(null)
 
   useEffect(() => {
     async function load() {
@@ -49,14 +51,17 @@ export default function Team() {
       ) : (
         <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {members.map((member) => (
-            <Card key={member.id} className="hover:border-border-strong">
+            <Card
+              key={member.id}
+              onClick={() => setSelectedMember(member)}
+              className="cursor-pointer hover:border-border-strong"
+            >
               <CardContent className="flex flex-col items-center gap-2 pt-6 text-center">
                 <InitialsAvatar
                   firstName={member.first_name}
                   lastName={member.last_name}
                   avatarUrl={member.avatar_url}
                   size={64}
-                  soft
                 />
                 <p className="font-display text-[16px] font-bold text-text">
                   {member.first_name} {member.last_name}
@@ -67,6 +72,7 @@ export default function Team() {
                 <div className="space-y-1 pt-1">
                   <a
                     href={`mailto:${member.email}`}
+                    onClick={(e) => e.stopPropagation()}
                     className="flex items-center justify-center gap-1.5 text-[13px] text-text-sub hover:text-primary"
                   >
                     <Mail className="h-3.5 w-3.5" strokeWidth={1.5} />
@@ -75,6 +81,7 @@ export default function Team() {
                   {member.phone && (
                     <a
                       href={`tel:${member.phone}`}
+                      onClick={(e) => e.stopPropagation()}
                       className="flex items-center justify-center gap-1.5 text-[13px] text-text-sub hover:text-primary"
                     >
                       <Phone className="h-3.5 w-3.5" strokeWidth={1.5} />
@@ -96,6 +103,12 @@ export default function Team() {
           ))}
         </div>
       )}
+
+      <MemberDetailDialog
+        member={selectedMember}
+        open={Boolean(selectedMember)}
+        onOpenChange={(open) => !open && setSelectedMember(null)}
+      />
     </div>
   )
 }
