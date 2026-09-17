@@ -58,7 +58,7 @@ export default function Products() {
           <SkeletonCard variant="product" />
           <SkeletonCard variant="product" />
         </div>
-      ) : filtered.length === 0 ? (
+      ) : products.length === 0 ? (
         <EmptyState
           icon={Package}
           title="Keine Produkte gefunden"
@@ -68,7 +68,7 @@ export default function Products() {
         />
       ) : (
         <div className="columns-1 gap-5 sm:columns-2 lg:columns-3">
-          {filtered.map((product, index) => (
+          {products.map((product, index) => (
             <motion.div
               key={product.id}
               initial={{ opacity: 0, y: 6 }}

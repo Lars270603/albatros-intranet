@@ -224,12 +224,14 @@ export default function Leitfaden() {
                       <div className="hidden items-center gap-0.5 group-hover:flex">
                         <button
                           onClick={() => moveArticle(article.id, -1)}
+                          title="Nach oben verschieben"
                           className="flex h-7 w-7 items-center justify-center text-text-muted hover:text-text"
                         >
                           <ChevronUp className="h-3.5 w-3.5" strokeWidth={1.5} />
                         </button>
                         <button
                           onClick={() => moveArticle(article.id, 1)}
+                          title="Nach unten verschieben"
                           className="flex h-7 w-7 items-center justify-center text-text-muted hover:text-text"
                         >
                           <ChevronDown className="h-3.5 w-3.5" strokeWidth={1.5} />
@@ -239,13 +241,14 @@ export default function Leitfaden() {
                             setEditingArticle(article)
                             setArticleDialogOpen(true)
                           }}
+                          title="Artikel bearbeiten"
                           className="flex h-7 w-7 items-center justify-center text-text-muted hover:text-text"
                         >
                           <Pencil className="h-3.5 w-3.5" strokeWidth={1.5} />
                         </button>
                         <AlertDialog>
                           <AlertDialogTrigger asChild>
-                            <button className="flex h-7 w-7 items-center justify-center text-text-muted hover:text-primary">
+                            <button title="Artikel löschen" className="flex h-7 w-7 items-center justify-center text-text-muted hover:text-primary">
                               <Trash2 className="h-3.5 w-3.5" strokeWidth={1.5} />
                             </button>
                           </AlertDialogTrigger>
