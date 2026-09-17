@@ -39,18 +39,18 @@ export function usePollById(pollId) {
 
   const castVote = useCallback(
     async (optionId) => {
-      if (!poll || !user || myVote) return
+      if (!poll || !user) return
       try {
         const { error } = await supabase
           .from('poll_votes')
-          .insert({ poll_id: poll.id, user_id: user.id, option_id: optionId })
+          .upsert({ poll_id: poll.id, user_id: user.id, option_id: optionId }, { onConflict: 'poll_id,user_id' })
         if (error) throw error
         await load()
       } catch (err) {
         console.error('Stimme konnte nicht gespeichert werden:', err)
       }
     },
-    [poll, user, myVote, load]
+    [poll, user, load]
   )
 
   return { poll, votes, myVote, loading, castVote }

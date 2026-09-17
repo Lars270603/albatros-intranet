@@ -1,5 +1,5 @@
-import { useEffect, useState } from 'react'
-import { Plus, X } from 'lucide-react'
+import { useEffect, useRef, useState } from 'react'
+import { Plus, X, Paperclip } from 'lucide-react'
 import {
   Dialog,
   DialogContent,
@@ -20,8 +20,13 @@ import {
 } from '@/components/ui/select'
 import { useToast } from '@/components/ui/use-toast'
 import { ICON_OPTIONS, resolveIcon } from '@/lib/iconMap'
+import { uploadFile, sanitizeFileName } from '@/lib/upload'
+import { FileTypeIcon } from '@/components/documents/FileTypeIcon'
 
 const EMPTY_TILE = { icon: 'Info', title: '', text: '' }
+
+const ALLOWED_ATTACHMENT_EXTENSIONS = ['pdf', 'xlsx', 'docx', 'pptx']
+const MAX_ATTACHMENT_SIZE = 20 * 1024 * 1024
 
 export function ArticleDialog({ open, onOpenChange, article, onSave }) {
   const { toast } = useToast()
@@ -32,6 +37,10 @@ export function ArticleDialog({ open, onOpenChange, article, onSave }) {
   const [externalLinkUrl, setExternalLinkUrl] = useState('')
   const [infoTiles, setInfoTiles] = useState([])
   const [body, setBody] = useState('')
+  const [attachments, setAttachments] = useState([])
+  const [attachmentDragOver, setAttachmentDragOver] = useState(false)
+  const [folderId, setFolderId] = useState(null)
+  const attachmentInputRef = useRef(null)
   const [submitting, setSubmitting] = useState(false)
 
   useEffect(() => {
@@ -43,8 +52,32 @@ export function ArticleDialog({ open, onOpenChange, article, onSave }) {
       setExternalLinkUrl(article?.external_link_url || '')
       setInfoTiles(article?.info_tiles?.length ? article.info_tiles : [])
       setBody(article?.body || '')
+      setAttachments(
+        (article?.attachments || []).map((a) => ({ name: a.name, type: a.type, url: a.url, file: null }))
+      )
+      setFolderId(article?.id || crypto.randomUUID())
     }
   }, [open, article])
+
+  function handleAttachmentFiles(fileList) {
+    const files = Array.from(fileList || [])
+    for (const file of files) {
+      const ext = file.name.split('.').pop().toLowerCase()
+      if (!ALLOWED_ATTACHMENT_EXTENSIONS.includes(ext)) {
+        toast({ variant: 'destructive', title: 'Ungültiges Dateiformat', description: 'Erlaubt: PDF, XLSX, DOCX, PPTX.' })
+        continue
+      }
+      if (file.size > MAX_ATTACHMENT_SIZE) {
+        toast({ variant: 'destructive', title: 'Datei zu groß', description: 'Maximale Dateigröße: 20 MB.' })
+        continue
+      }
+      setAttachments((prev) => [...prev, { name: file.name, type: ext, url: null, file }])
+    }
+  }
+
+  function removeAttachment(index) {
+    setAttachments((prev) => prev.filter((_, i) => i !== index))
+  }
 
   function updateTile(index, field, value) {
     setInfoTiles((prev) => prev.map((t, i) => (i === index ? { ...t, [field]: value } : t)))
@@ -63,6 +96,17 @@ export function ArticleDialog({ open, onOpenChange, article, onSave }) {
     e.preventDefault()
     setSubmitting(true)
     try {
+      const uploadedAttachments = await Promise.all(
+        attachments.map(async (att) => {
+          if (att.file) {
+            const path = `leitfaden-attachments/${folderId}/${sanitizeFileName(att.file.name)}`
+            const url = await uploadFile('documents', att.file, path)
+            return { name: att.name, url, type: att.type }
+          }
+          return { name: att.name, url: att.url, type: att.type }
+        })
+      )
+
       await onSave({
         title: title.trim(),
         short_description: shortDescription.trim() || null,
@@ -71,6 +115,7 @@ export function ArticleDialog({ open, onOpenChange, article, onSave }) {
         external_link_url: externalLinkUrl.trim() || null,
         info_tiles: infoTiles.filter((t) => t.title.trim()),
         body,
+        attachments: uploadedAttachments,
       })
       onOpenChange(false)
     } catch (err) {
@@ -199,6 +244,60 @@ export function ArticleDialog({ open, onOpenChange, article, onSave }) {
             <p className="text-[12px] text-text-muted">
               Nummerierte Listen (1. 2. 3. …) werden automatisch als rote Schritt-Kacheln dargestellt.
             </p>
+          </div>
+
+          <div className="space-y-2">
+            <Label>Dateianhänge (optional)</Label>
+            <div
+              onDragOver={(e) => {
+                e.preventDefault()
+                setAttachmentDragOver(true)
+              }}
+              onDragLeave={() => setAttachmentDragOver(false)}
+              onDrop={(e) => {
+                e.preventDefault()
+                setAttachmentDragOver(false)
+                handleAttachmentFiles(e.dataTransfer.files)
+              }}
+              onClick={() => attachmentInputRef.current?.click()}
+              className={`flex cursor-pointer flex-col items-center gap-2 rounded-md border border-dashed p-6 text-center transition-colors ${
+                attachmentDragOver ? 'border-primary bg-primary-light' : 'border-border hover:border-border-strong'
+              }`}
+            >
+              <Paperclip className="h-6 w-6 text-text-muted" strokeWidth={1.5} />
+              <p className="text-[13px] text-text-sub">
+                Dateien hierher ziehen oder <span className="font-medium text-primary">durchsuchen</span>
+              </p>
+              <p className="text-[12px] text-text-muted">PDF, XLSX, DOCX oder PPTX, max. 20 MB pro Datei</p>
+              <input
+                ref={attachmentInputRef}
+                type="file"
+                multiple
+                accept=".pdf,.xlsx,.docx,.pptx"
+                className="hidden"
+                onChange={(e) => {
+                  handleAttachmentFiles(e.target.files)
+                  e.target.value = ''
+                }}
+              />
+            </div>
+            {attachments.length > 0 && (
+              <div className="space-y-1.5">
+                {attachments.map((att, index) => (
+                  <div key={index} className="flex items-center gap-3 rounded-md border border-border p-3">
+                    <FileTypeIcon fileType={att.type} className="h-5 w-5 shrink-0" />
+                    <span className="flex-1 truncate text-[13px] text-text">{att.name}</span>
+                    <button
+                      type="button"
+                      onClick={() => removeAttachment(index)}
+                      className="text-text-muted hover:text-primary"
+                    >
+                      <X className="h-4 w-4" strokeWidth={1.5} />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
 
           <DialogFooter>

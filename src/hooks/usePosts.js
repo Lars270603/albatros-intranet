@@ -46,6 +46,7 @@ export function usePosts(scopes) {
         .from('news_posts')
         .select('*, author:profiles(*)')
         .in('scope', scopes)
+        .eq('archived', false)
         .order('created_at', { ascending: false })
       if (error) throw error
       setPosts(data || [])
@@ -146,7 +147,18 @@ export function usePosts(scopes) {
     }
   }, [])
 
-  return { posts, reactions, loading, toggleReaction, togglePin, deletePost, reload: load }
+  const archivePost = useCallback(async (postId) => {
+    try {
+      const { error } = await supabase.from('news_posts').update({ archived: true }).eq('id', postId)
+      if (error) throw error
+      setPosts((prev) => prev.filter((p) => p.id !== postId))
+    } catch (err) {
+      console.error('Beitrag konnte nicht archiviert werden:', err)
+      throw err
+    }
+  }, [])
+
+  return { posts, reactions, loading, toggleReaction, togglePin, deletePost, archivePost, reload: load }
 }
 
 export { EMOJIS }

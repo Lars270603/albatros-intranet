@@ -18,8 +18,9 @@ export default function News() {
   const { profile } = useAuth()
   const { toast } = useToast()
   const [composerOpen, setComposerOpen] = useState(false)
+  const [editingPost, setEditingPost] = useState(null)
 
-  const { posts, reactions, loading, toggleReaction, togglePin, deletePost } = usePosts(SCOPES)
+  const { posts, loading, togglePin, deletePost, archivePost } = usePosts(SCOPES)
   const { poll, votes, myVote, castVote } = useActivePoll(SCOPES)
 
   const isAdmin = profile?.role === 'admin'
@@ -36,6 +37,15 @@ export default function News() {
     }
   }
 
+  async function handleArchive(post) {
+    try {
+      await archivePost(post.id)
+      toast({ title: 'Beitrag ins Archiv verschoben' })
+    } catch {
+      toast({ variant: 'destructive', title: 'Fehler', description: 'Aktion fehlgeschlagen.' })
+    }
+  }
+
   async function handleTogglePin(post) {
     try {
       await togglePin(post)
@@ -44,11 +54,26 @@ export default function News() {
     }
   }
 
+  function handleEdit(post) {
+    setEditingPost(post)
+    setComposerOpen(true)
+  }
+
+  function handleComposerOpenChange(open) {
+    setComposerOpen(open)
+    if (!open) setEditingPost(null)
+  }
+
   return (
     <div className="max-w-[720px] space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="font-display text-[32px] font-extrabold tracking-tight text-text">News</h1>
-        <Button onClick={() => setComposerOpen(true)}>
+        <Button
+          onClick={() => {
+            setEditingPost(null)
+            setComposerOpen(true)
+          }}
+        >
           <Plus className="h-4 w-4" strokeWidth={1.5} />
           Beitrag erstellen
         </Button>
@@ -72,11 +97,11 @@ export default function News() {
               >
                 <PostCard
                   post={post}
-                  reactions={reactions[post.id]}
-                  onToggleReaction={toggleReaction}
                   isAdmin={isAdmin}
                   onTogglePin={handleTogglePin}
                   onDelete={handleDelete}
+                  onEdit={handleEdit}
+                  onArchive={handleArchive}
                   pinnedStyle
                 />
               </motion.div>
@@ -102,11 +127,11 @@ export default function News() {
                 >
                   <PostCard
                     post={post}
-                    reactions={reactions[post.id]}
-                    onToggleReaction={toggleReaction}
                     isAdmin={isAdmin}
                     onTogglePin={handleTogglePin}
                     onDelete={handleDelete}
+                    onEdit={handleEdit}
+                    onArchive={handleArchive}
                   />
                 </motion.div>
               ))
@@ -117,8 +142,9 @@ export default function News() {
 
       <PostComposerDialog
         open={composerOpen}
-        onOpenChange={setComposerOpen}
+        onOpenChange={handleComposerOpenChange}
         onCreated={() => {}}
+        post={editingPost}
       />
     </div>
   )

@@ -43,12 +43,15 @@ create trigger on_auth_user_created
 create table if not exists news_posts (
   id uuid default gen_random_uuid() primary key,
   title text not null,
-  body text not null,
+  body text,
   image_url text,
   scope text not null
     check (scope in ('general','vertrieb','einkauf','kundenservice','geschaeftsfuehrung')),
   author_id uuid references profiles(id) on delete cascade not null,
   pinned boolean default false,
+  archived boolean not null default false,
+  event_date date,
+  event_end_date date,
   created_at timestamptz default now()
 );
 
@@ -162,7 +165,7 @@ alter table notifications enable row level security;
 
 -- PROFILES
 create policy "profiles_select" on profiles for select using (auth.uid() is not null);
-create policy "profiles_update_own" on profiles for update using (auth.uid() = id);
+create policy "profiles_update_authenticated" on profiles for update using (auth.uid() is not null);
 create policy "profiles_insert_own" on profiles for insert with check (auth.uid() = id);
 
 -- NEWS POSTS
@@ -210,6 +213,7 @@ create policy "polls_delete" on polls for delete using (auth.uid() = created_by)
 -- POLL VOTES
 create policy "votes_select" on poll_votes for select using (auth.uid() is not null);
 create policy "votes_insert" on poll_votes for insert with check (auth.uid() = user_id);
+create policy "poll_votes_update_own" on poll_votes for update using (auth.uid() = user_id);
 
 -- NOTIFICATIONS
 create policy "notif_select_own" on notifications for select using (auth.uid() = user_id);
@@ -227,7 +231,8 @@ values
   ('news-images', 'news-images', true),
   ('documents', 'documents', true),
   ('product-images', 'product-images', true),
-  ('avatars', 'avatars', true)
+  ('avatars', 'avatars', true),
+  ('poll-images', 'poll-images', true)
 on conflict (id) do nothing;
 
 create policy "news_images_read" on storage.objects for select using (bucket_id = 'news-images');
@@ -246,6 +251,10 @@ create policy "avatars_read" on storage.objects for select using (bucket_id = 'a
 create policy "avatars_write" on storage.objects for insert with check (bucket_id = 'avatars' and auth.uid() is not null);
 create policy "avatars_update" on storage.objects for update using (bucket_id = 'avatars' and auth.uid() is not null);
 create policy "avatars_delete" on storage.objects for delete using (bucket_id = 'avatars' and auth.uid() is not null);
+
+create policy "poll_images_read" on storage.objects for select using (bucket_id = 'poll-images');
+create policy "poll_images_write" on storage.objects for insert with check (bucket_id = 'poll-images' and auth.uid() is not null);
+create policy "poll_images_delete" on storage.objects for delete using (bucket_id = 'poll-images' and auth.uid() is not null);
 
 -- ============================================================
 -- UPDATE v1 (siehe supabase/migrations/002_update_v1.sql)
@@ -382,6 +391,7 @@ create table if not exists leitfaden_articles (
   info_tiles jsonb not null default '[]'::jsonb,
   body text not null default '',
   sort_order int default 0,
+  attachments jsonb not null default '[]'::jsonb,
   created_by uuid references profiles(id) on delete set null,
   updated_at timestamptz default now()
 );
@@ -390,3 +400,19 @@ create policy "leitfaden_articles_select" on leitfaden_articles for select using
 create policy "leitfaden_articles_insert" on leitfaden_articles for insert with check (auth.uid() is not null);
 create policy "leitfaden_articles_update" on leitfaden_articles for update using (auth.uid() is not null);
 create policy "leitfaden_articles_delete" on leitfaden_articles for delete using (auth.uid() is not null);
+
+-- ============================================================
+-- UPDATE v4 (siehe supabase/migrations/005_update_v4.sql)
+-- Gelesen-Funktion für News-Posts
+-- ============================================================
+
+create table if not exists post_reads (
+  id uuid default gen_random_uuid() primary key,
+  post_id uuid references news_posts(id) on delete cascade not null,
+  user_id uuid references profiles(id) on delete cascade not null,
+  read_at timestamptz default now(),
+  unique(post_id, user_id)
+);
+alter table post_reads enable row level security;
+create policy "post_reads_select" on post_reads for select using (auth.uid() is not null);
+create policy "post_reads_insert" on post_reads for insert with check (auth.uid() = user_id);

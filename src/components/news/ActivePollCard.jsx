@@ -8,6 +8,7 @@ import { cn } from '@/lib/utils'
 /**
  * Zeigt die aktive Umfrage oben im News-Feed. Bleibt nach dem Abstimmen
  * sichtbar und zeigt dann die Ergebnisbalken statt zu verschwinden.
+ * Optionen sind auch nach dem Abstimmen weiterhin klickbar (Stimme ändern).
  */
 export function ActivePollCard({ poll, votes = [], myVote = null, onVote }) {
   const { toast } = useToast()
@@ -16,6 +17,7 @@ export function ActivePollCard({ poll, votes = [], myVote = null, onVote }) {
 
   const options = poll.options || []
   const totalVotes = votes.length
+  const hasImages = options.some((o) => o.image_url)
 
   async function handleVote(optionId) {
     try {
@@ -33,7 +35,45 @@ export function ActivePollCard({ poll, votes = [], myVote = null, onVote }) {
       <CardContent className="space-y-4">
         <p className="font-display text-[17px] font-bold leading-snug text-text">{poll.question}</p>
 
-        {!myVote ? (
+        {hasImages ? (
+          <div
+            className="grid gap-3"
+            style={{ gridTemplateColumns: `repeat(${Math.min(options.length, 4)}, minmax(0, 1fr))` }}
+          >
+            {options.map((option) => {
+              const count = votes.filter((v) => v.option_id === option.id).length
+              const pct = totalVotes > 0 ? Math.round((count / totalVotes) * 100) : 0
+              const isMine = myVote?.option_id === option.id
+              return (
+                <button
+                  key={option.id}
+                  type="button"
+                  onClick={() => handleVote(option.id)}
+                  className={cn(
+                    'group relative overflow-hidden rounded-[10px] border text-left transition-colors duration-150',
+                    isMine ? 'border-primary ring-2 ring-primary' : 'border-border hover:border-primary'
+                  )}
+                >
+                  <div className="relative aspect-square w-full">
+                    {option.image_url && (
+                      <img
+                        src={option.image_url}
+                        alt={option.label}
+                        className="h-full w-full object-cover"
+                      />
+                    )}
+                    {myVote && (
+                      <span className="absolute bottom-1.5 right-1.5 rounded-[4px] bg-black/60 px-1.5 py-0.5 text-[11px] font-medium text-white">
+                        {pct}% · {count}
+                      </span>
+                    )}
+                  </div>
+                  <p className="p-2 text-[13px] font-medium text-text">{option.label}</p>
+                </button>
+              )
+            })}
+          </div>
+        ) : !myVote ? (
           <div className="space-y-2">
             {options.map((option) => (
               <Button
@@ -53,9 +93,14 @@ export function ActivePollCard({ poll, votes = [], myVote = null, onVote }) {
               const pct = totalVotes > 0 ? Math.round((count / totalVotes) * 100) : 0
               const isMine = myVote.option_id === option.id
               return (
-                <div key={option.id} className="space-y-1.5">
+                <button
+                  key={option.id}
+                  type="button"
+                  onClick={() => handleVote(option.id)}
+                  className="block w-full space-y-1.5 text-left"
+                >
                   <div className="flex items-center justify-between text-[13px]">
-                    <span className="text-text">{option.label}</span>
+                    <span className={cn('text-text', isMine && 'font-medium text-primary')}>{option.label}</span>
                     <span className="font-medium text-text-sub">
                       {pct}% · {count} {count === 1 ? 'Stimme' : 'Stimmen'}
                     </span>
@@ -66,7 +111,7 @@ export function ActivePollCard({ poll, votes = [], myVote = null, onVote }) {
                       style={{ width: `${pct}%` }}
                     />
                   </div>
-                </div>
+                </button>
               )
             })}
           </div>

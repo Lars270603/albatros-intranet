@@ -48,19 +48,19 @@ export function useActivePoll(scopes) {
 
   const castVote = useCallback(
     async (optionId) => {
-      if (!poll || !user || myVote) return
-      setVotes((prev) => [...prev, { poll_id: poll.id, user_id: user.id, option_id: optionId }])
+      if (!poll || !user) return
+      setVotes((prev) => [...prev.filter((v) => v.user_id !== user.id), { poll_id: poll.id, user_id: user.id, option_id: optionId }])
       try {
         const { error } = await supabase
           .from('poll_votes')
-          .insert({ poll_id: poll.id, user_id: user.id, option_id: optionId })
+          .upsert({ poll_id: poll.id, user_id: user.id, option_id: optionId }, { onConflict: 'poll_id,user_id' })
         if (error) throw error
       } catch (err) {
         console.error('Stimme konnte nicht gespeichert werden:', err)
         load()
       }
     },
-    [poll, user, myVote, load]
+    [poll, user, load]
   )
 
   return { poll, votes, myVote, loading, castVote }

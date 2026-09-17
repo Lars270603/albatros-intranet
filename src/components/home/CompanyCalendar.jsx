@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
-import { ChevronLeft, ChevronRight, Plus, Trash2 } from 'lucide-react'
+import { Link } from 'react-router-dom'
+import { ChevronLeft, ChevronRight, Plus, Trash2, Newspaper, CalendarDays, Cake } from 'lucide-react'
 import { Card } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -51,6 +52,7 @@ export function CompanyCalendar() {
   const { toast } = useToast()
   const { events, addEvent, deleteEvent } = useCalendarEvents()
   const [birthdays, setBirthdays] = useState([])
+  const [newsEvents, setNewsEvents] = useState([])
   const [viewDate, setViewDate] = useState(new Date())
   const [selectedDate, setSelectedDate] = useState(new Date())
   const [addOpen, setAddOpen] = useState(false)
@@ -73,6 +75,23 @@ export function CompanyCalendar() {
     loadBirthdays()
   }, [])
 
+  useEffect(() => {
+    async function loadNewsEvents() {
+      try {
+        const { data, error } = await supabase
+          .from('news_posts')
+          .select('id, title, event_date, event_end_date')
+          .eq('archived', false)
+          .not('event_date', 'is', null)
+        if (error) throw error
+        setNewsEvents(data || [])
+      } catch (err) {
+        console.error('Termine aus News konnten nicht geladen werden:', err)
+      }
+    }
+    loadNewsEvents()
+  }, [])
+
   const today = new Date()
   const cells = useMemo(() => buildMonthGrid(viewDate), [viewDate])
 
@@ -86,6 +105,22 @@ export function CompanyCalendar() {
     return map
   }, [events])
 
+  const newsEventsByDay = useMemo(() => {
+    const map = {}
+    for (const post of newsEvents) {
+      const start = new Date(post.event_date)
+      const end = post.event_end_date ? new Date(post.event_end_date) : start
+      const cursor = new Date(start)
+      while (cursor <= end) {
+        const key = toDateKey(cursor)
+        if (!map[key]) map[key] = []
+        map[key].push(post)
+        cursor.setDate(cursor.getDate() + 1)
+      }
+    }
+    return map
+  }, [newsEvents])
+
   function birthdaysOn(date) {
     return birthdays.filter((p) => {
       const b = new Date(p.birthday)
@@ -95,7 +130,9 @@ export function CompanyCalendar() {
 
   const selectedKey = toDateKey(selectedDate)
   const selectedEvents = eventsByDay[selectedKey] || []
+  const selectedNewsEvents = newsEventsByDay[selectedKey] || []
   const selectedBirthdays = birthdaysOn(selectedDate)
+  const hasAnySelected = selectedEvents.length + selectedNewsEvents.length + selectedBirthdays.length > 0
 
   async function handleAddEvent(e) {
     e.preventDefault()
@@ -143,7 +180,20 @@ export function CompanyCalendar() {
         </div>
       </div>
 
-      <div className="mt-5 grid grid-cols-7 gap-1">
+      {/* Legende */}
+      <div className="mt-4 flex flex-wrap items-center gap-4">
+        <span className="flex items-center gap-1.5 text-[12px] text-text-muted">
+          <span className="h-1.5 w-1.5 rounded-full bg-primary" /> News-Termin
+        </span>
+        <span className="flex items-center gap-1.5 text-[12px] text-text-muted">
+          <span className="h-1.5 w-1.5 rounded-full bg-info" /> Firmentermin
+        </span>
+        <span className="flex items-center gap-1.5 text-[12px] text-text-muted">
+          <span className="h-1.5 w-1.5 rounded-full bg-warning" /> Geburtstag
+        </span>
+      </div>
+
+      <div className="mt-5 grid grid-cols-7 gap-1.5">
         {WEEKDAYS.map((wd) => (
           <p key={wd} className="pb-1 text-center label-micro">
             {wd}
@@ -154,7 +204,8 @@ export function CompanyCalendar() {
           const key = toDateKey(date)
           const isToday = date.toDateString() === today.toDateString()
           const isSelected = date.toDateString() === selectedDate.toDateString()
-          const hasEvent = Boolean(eventsByDay[key]?.length)
+          const hasCompanyEvent = Boolean(eventsByDay[key]?.length)
+          const hasNewsEvent = Boolean(newsEventsByDay[key]?.length)
           const hasBirthday = birthdaysOn(date).length > 0
 
           return (
@@ -162,18 +213,23 @@ export function CompanyCalendar() {
               key={key}
               onClick={() => setSelectedDate(date)}
               className={cn(
-                'flex aspect-square flex-col items-center justify-center gap-0.5 rounded-[7px] text-[13px] transition-colors duration-150',
+                'flex aspect-square flex-col items-center justify-center gap-1 rounded-[8px] text-[14px] transition-colors duration-150',
                 isToday && 'bg-primary font-bold text-white',
                 !isToday && isSelected && 'bg-surface-2 text-text',
-                !isToday && !isSelected && 'text-text hover:bg-surface-2'
+                !isToday && !isSelected && 'text-text hover:bg-primary/5'
               )}
             >
               <span>{date.getDate()}</span>
-              <span className="flex h-2.5 items-center gap-0.5">
-                {hasEvent && (
-                  <span className={cn('h-1 w-1 rounded-full', isToday ? 'bg-white' : 'bg-primary')} />
+              <span className="flex h-1.5 items-center gap-1">
+                {hasNewsEvent && (
+                  <span className={cn('h-1.5 w-1.5 rounded-full', isToday ? 'bg-white' : 'bg-primary')} />
                 )}
-                {hasBirthday && <span className="text-[9px] leading-none">🎂</span>}
+                {hasCompanyEvent && (
+                  <span className={cn('h-1.5 w-1.5 rounded-full', isToday ? 'bg-white' : 'bg-info')} />
+                )}
+                {hasBirthday && (
+                  <span className={cn('h-1.5 w-1.5 rounded-full', isToday ? 'bg-white' : 'bg-warning')} />
+                )}
               </span>
             </button>
           )
@@ -193,25 +249,52 @@ export function CompanyCalendar() {
           )}
         </div>
 
-        <div className="mt-3 space-y-1.5">
-          {selectedBirthdays.map((p) => (
-            <p key={p.id} className="text-[13px] text-text-sub">
-              🎂 {p.first_name} Geburtstag
-            </p>
-          ))}
-          {selectedEvents.map((ev) => (
-            <div key={ev.id} className="flex items-center justify-between text-[13px] text-text">
-              <span>{ev.title}</span>
-              {isAdmin && (
-                <button onClick={() => handleDeleteEvent(ev.id)} className="text-text-muted hover:text-primary">
-                  <Trash2 className="h-3.5 w-3.5" strokeWidth={1.5} />
-                </button>
-              )}
+        <div className="mt-3 space-y-3">
+          {selectedNewsEvents.length > 0 && (
+            <div className="space-y-1.5">
+              {selectedNewsEvents.map((post) => (
+                <Link
+                  key={post.id}
+                  to="/news"
+                  className="flex items-center gap-2 text-[13px] text-text hover:text-primary"
+                >
+                  <Newspaper className="h-3.5 w-3.5 shrink-0 text-primary" strokeWidth={1.5} />
+                  {post.title}
+                </Link>
+              ))}
             </div>
-          ))}
-          {selectedBirthdays.length === 0 && selectedEvents.length === 0 && (
-            <p className="text-[13px] text-text-muted">Keine Termine an diesem Tag.</p>
           )}
+
+          {selectedEvents.length > 0 && (
+            <div className="space-y-1.5">
+              {selectedEvents.map((ev) => (
+                <div key={ev.id} className="flex items-center justify-between text-[13px] text-text">
+                  <span className="flex items-center gap-2">
+                    <CalendarDays className="h-3.5 w-3.5 shrink-0 text-info" strokeWidth={1.5} />
+                    {ev.title}
+                  </span>
+                  {isAdmin && (
+                    <button onClick={() => handleDeleteEvent(ev.id)} className="text-text-muted hover:text-primary">
+                      <Trash2 className="h-3.5 w-3.5" strokeWidth={1.5} />
+                    </button>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
+
+          {selectedBirthdays.length > 0 && (
+            <div className="space-y-1.5">
+              {selectedBirthdays.map((p) => (
+                <p key={p.id} className="flex items-center gap-2 text-[13px] text-text-sub">
+                  <Cake className="h-3.5 w-3.5 shrink-0 text-warning" strokeWidth={1.5} />
+                  {p.first_name} Geburtstag
+                </p>
+              ))}
+            </div>
+          )}
+
+          {!hasAnySelected && <p className="text-[13px] text-text-muted">Keine Termine an diesem Tag.</p>}
         </div>
       </div>
 

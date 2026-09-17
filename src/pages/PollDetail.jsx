@@ -34,8 +34,14 @@ export default function PollDetail() {
 
   const options = poll.options || []
   const totalVotes = votes.length
+  const hasImages = options.some((o) => o.image_url)
+  const isExpired = poll.expires_at && new Date(poll.expires_at) < new Date()
 
-  async function handleVote() {
+  async function handleVote(optionId) {
+    await castVote(optionId)
+  }
+
+  async function handleVoteSelected() {
     if (!selected) return
     await castVote(selected)
   }
@@ -55,6 +61,7 @@ export default function PollDetail() {
               Öffentliche Abstimmung
             </Badge>
           )}
+          {isExpired && <Badge className="border-transparent bg-warning-light text-warning">Abgelaufen</Badge>}
         </div>
         <h1 className="font-display text-[26px] font-extrabold leading-tight text-text">{poll.question}</h1>
         <p className="text-[13px] text-text-muted">
@@ -62,7 +69,46 @@ export default function PollDetail() {
         </p>
       </div>
 
-      {!myVote ? (
+      {hasImages ? (
+        <div>
+          <div
+            className="grid gap-3"
+            style={{ gridTemplateColumns: `repeat(${Math.min(options.length, 4)}, minmax(0, 1fr))` }}
+          >
+            {options.map((option) => {
+              const optionVotes = votes.filter((v) => v.option_id === option.id)
+              const count = optionVotes.length
+              const pct = totalVotes > 0 ? Math.round((count / totalVotes) * 100) : 0
+              const isMine = myVote?.option_id === option.id
+              return (
+                <button
+                  key={option.id}
+                  type="button"
+                  onClick={() => !isExpired && handleVote(option.id)}
+                  disabled={isExpired}
+                  className={cn(
+                    'group relative overflow-hidden rounded-[10px] border text-left transition-colors duration-150',
+                    isMine ? 'border-primary ring-2 ring-primary' : 'border-border hover:border-primary',
+                    isExpired && 'cursor-default opacity-70'
+                  )}
+                >
+                  <div className="relative aspect-square w-full">
+                    {option.image_url && (
+                      <img src={option.image_url} alt={option.label} className="h-full w-full object-cover" />
+                    )}
+                    {myVote && (
+                      <span className="absolute bottom-1.5 right-1.5 rounded-[4px] bg-black/60 px-1.5 py-0.5 text-[11px] font-medium text-white">
+                        {pct}% · {count}
+                      </span>
+                    )}
+                  </div>
+                  <p className="p-2 text-[13px] font-medium text-text">{option.label}</p>
+                </button>
+              )
+            })}
+          </div>
+        </div>
+      ) : !myVote && !isExpired ? (
         <div className="space-y-3">
           {options.map((option) => (
             <Button
@@ -77,7 +123,7 @@ export default function PollDetail() {
               {option.label}
             </Button>
           ))}
-          <Button onClick={handleVote} disabled={!selected} className="w-full">
+          <Button onClick={handleVoteSelected} disabled={!selected} className="w-full">
             Abstimmen
           </Button>
         </div>
@@ -87,11 +133,16 @@ export default function PollDetail() {
             const optionVotes = votes.filter((v) => v.option_id === option.id)
             const count = optionVotes.length
             const pct = totalVotes > 0 ? Math.round((count / totalVotes) * 100) : 0
-            const isMine = myVote.option_id === option.id
+            const isMine = myVote?.option_id === option.id
 
             return (
               <div key={option.id} className="space-y-1.5">
-                <div className="flex items-center justify-between text-[14px]">
+                <button
+                  type="button"
+                  disabled={isExpired}
+                  onClick={() => !isExpired && handleVote(option.id)}
+                  className={cn('flex w-full items-center justify-between text-[14px]', isExpired && 'cursor-default')}
+                >
                   <span className="font-medium text-text">
                     {option.label}
                     {isMine && <span className="ml-2 text-[12px] font-medium text-primary">Deine Stimme</span>}
@@ -99,7 +150,7 @@ export default function PollDetail() {
                   <span className="text-text-sub">
                     {pct}% · {count} {count === 1 ? 'Stimme' : 'Stimmen'}
                   </span>
-                </div>
+                </button>
                 <div className="h-2 w-full overflow-hidden rounded-[4px] bg-surface-2">
                   <div
                     className={cn('h-full rounded-[4px]', isMine ? 'bg-primary' : 'bg-border-strong')}
@@ -151,7 +202,7 @@ export default function PollDetail() {
         </div>
       )}
 
-      {poll.expires_at && (
+      {poll.expires_at && !isExpired && (
         <p className="text-[13px] text-text-muted">Endet in {daysUntil(poll.expires_at)} Tagen</p>
       )}
 

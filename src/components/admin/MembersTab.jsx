@@ -1,4 +1,5 @@
-import { Trash2 } from 'lucide-react'
+import { useState } from 'react'
+import { Camera, Trash2 } from 'lucide-react'
 import { motion } from 'motion/react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -22,6 +23,7 @@ import {
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog'
 import { InitialsAvatar } from '@/components/shared/InitialsAvatar'
+import { MemberPhotoDialog } from '@/components/admin/MemberPhotoDialog'
 import { useToast } from '@/components/ui/use-toast'
 import { useAuth } from '@/hooks/useAuth'
 import { supabase } from '@/lib/supabase'
@@ -35,6 +37,7 @@ const STATUS_CONFIG = {
 export function MembersTab({ members, onChanged }) {
   const { user } = useAuth()
   const { toast } = useToast()
+  const [photoMember, setPhotoMember] = useState(null)
 
   async function updateRole(profile, role) {
     try {
@@ -74,6 +77,7 @@ export function MembersTab({ members, onChanged }) {
   }
 
   return (
+    <>
     <Table>
       <TableHeader>
         <TableRow>
@@ -129,6 +133,14 @@ export function MembersTab({ members, onChanged }) {
                   <Button variant="outline" size="sm" onClick={() => toggleStatus(profile)} disabled={isSelf}>
                     {profile.status === 'active' ? 'Sperren' : 'Entsperren'}
                   </Button>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-8 w-8"
+                    onClick={() => setPhotoMember(profile)}
+                  >
+                    <Camera className="h-4 w-4" strokeWidth={1.5} />
+                  </Button>
                   <AlertDialog>
                     <AlertDialogTrigger asChild>
                       <Button variant="ghost" size="icon" className="h-8 w-8" disabled={isSelf}>
@@ -157,5 +169,14 @@ export function MembersTab({ members, onChanged }) {
         })}
       </TableBody>
     </Table>
+    <MemberPhotoDialog
+      member={photoMember}
+      open={!!photoMember}
+      onOpenChange={(next) => {
+        if (!next) setPhotoMember(null)
+      }}
+      onUploaded={onChanged}
+    />
+    </>
   )
 }

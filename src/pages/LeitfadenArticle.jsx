@@ -2,10 +2,11 @@ import { useEffect, useState } from 'react'
 import { useParams, useNavigate, Link } from 'react-router-dom'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
-import { ArrowLeft, ExternalLink } from 'lucide-react'
+import { ArrowLeft, ExternalLink, Download } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 import { EmptyState } from '@/components/shared/EmptyState'
+import { FileTypeIcon } from '@/components/documents/FileTypeIcon'
 import { supabase } from '@/lib/supabase'
 import { resolveIcon } from '@/lib/iconMap'
 
@@ -138,6 +139,28 @@ export default function LeitfadenArticle() {
           >
             {article.body}
           </ReactMarkdown>
+        </div>
+      )}
+
+      {/* 4. Dateianhänge */}
+      {article.attachments?.length > 0 && (
+        <div className="space-y-3">
+          <p className="label-micro">Dateien</p>
+          <div className="space-y-1.5">
+            {article.attachments.map((attachment, index) => (
+              <div
+                key={index}
+                className="flex items-center gap-3 rounded-md border border-border bg-surface p-3"
+              >
+                <FileTypeIcon fileType={attachment.type} className="h-5 w-5 shrink-0" />
+                <span className="flex-1 truncate text-[13px] font-medium text-text">{attachment.name}</span>
+                <Button variant="outline" size="sm" onClick={() => window.open(attachment.url, '_blank')}>
+                  <Download className="h-3.5 w-3.5" strokeWidth={1.5} />
+                  Herunterladen
+                </Button>
+              </div>
+            ))}
+          </div>
         </div>
       )}
     </div>

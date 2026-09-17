@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { motion } from 'motion/react'
 import { Plus, Package } from 'lucide-react'
@@ -6,18 +6,15 @@ import { Button } from '@/components/ui/button'
 import { SkeletonCard } from '@/components/shared/SkeletonCard'
 import { EmptyState } from '@/components/shared/EmptyState'
 import { ProductCard } from '@/components/products/ProductCard'
-import { BRANDS } from '@/components/shared/BrandBadge'
 import { useAuth } from '@/hooks/useAuth'
 import { supabase } from '@/lib/supabase'
 import { canCreateProducts } from '@/lib/permissions'
-import { cn } from '@/lib/utils'
 
 export default function Products() {
   const { profile } = useAuth()
   const navigate = useNavigate()
   const [products, setProducts] = useState([])
   const [loading, setLoading] = useState(true)
-  const [activeBrand, setActiveBrand] = useState('all')
 
   useEffect(() => {
     async function load() {
@@ -41,11 +38,6 @@ export default function Products() {
     load()
   }, [])
 
-  const filtered = useMemo(
-    () => (activeBrand === 'all' ? products : products.filter((p) => p.brand === activeBrand)),
-    [products, activeBrand]
-  )
-
   const canCreate = canCreateProducts(profile)
 
   return (
@@ -58,32 +50,6 @@ export default function Products() {
             Produkt anlegen
           </Button>
         )}
-      </div>
-
-      <div className="flex flex-wrap gap-2">
-        <button
-          onClick={() => setActiveBrand('all')}
-          className={cn(
-            'rounded-sm px-3 py-1 text-[13px] font-medium transition-colors',
-            activeBrand === 'all' ? 'bg-primary text-white' : 'bg-surface-2 text-text-sub hover:bg-surface'
-          )}
-        >
-          Alle
-        </button>
-        {Object.entries(BRANDS).map(([key, config]) => (
-          <button
-            key={key}
-            onClick={() => setActiveBrand(key)}
-            className="rounded-sm px-3 py-1 text-[13px] font-medium transition-colors"
-            style={
-              activeBrand === key
-                ? { backgroundColor: config.fg, color: '#fff' }
-                : { backgroundColor: config.bg, color: config.fg }
-            }
-          >
-            {config.label}
-          </button>
-        ))}
       </div>
 
       {loading ? (
