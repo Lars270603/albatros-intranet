@@ -172,7 +172,7 @@ create policy "profiles_insert_own" on profiles for insert with check (auth.uid(
 create policy "news_select" on news_posts for select using (auth.uid() is not null);
 create policy "news_insert" on news_posts for insert with check (auth.uid() is not null);
 create policy "news_delete_own" on news_posts for delete using (auth.uid() = author_id);
-create policy "news_update" on news_posts for update using (auth.uid() = author_id);
+create policy "news_posts_update_authenticated" on news_posts for update using (auth.uid() is not null);
 
 -- POST REACTIONS
 create policy "reactions_select" on post_reactions for select using (auth.uid() is not null);
@@ -209,6 +209,7 @@ create policy "pa_delete_own" on product_answers for delete using (auth.uid() = 
 create policy "polls_select" on polls for select using (auth.uid() is not null);
 create policy "polls_insert" on polls for insert with check (auth.uid() is not null);
 create policy "polls_delete" on polls for delete using (auth.uid() = created_by);
+create policy "polls_update_authenticated" on polls for update using (auth.uid() is not null);
 
 -- POLL VOTES
 create policy "votes_select" on poll_votes for select using (auth.uid() is not null);
@@ -232,7 +233,8 @@ values
   ('documents', 'documents', true),
   ('product-images', 'product-images', true),
   ('avatars', 'avatars', true),
-  ('poll-images', 'poll-images', true)
+  ('poll-images', 'poll-images', true),
+  ('leitfaden-images', 'leitfaden-images', true)
 on conflict (id) do nothing;
 
 create policy "news_images_read" on storage.objects for select using (bucket_id = 'news-images');
@@ -255,6 +257,10 @@ create policy "avatars_delete" on storage.objects for delete using (bucket_id = 
 create policy "poll_images_read" on storage.objects for select using (bucket_id = 'poll-images');
 create policy "poll_images_write" on storage.objects for insert with check (bucket_id = 'poll-images' and auth.uid() is not null);
 create policy "poll_images_delete" on storage.objects for delete using (bucket_id = 'poll-images' and auth.uid() is not null);
+
+create policy "leitfaden_images_read" on storage.objects for select using (bucket_id = 'leitfaden-images');
+create policy "leitfaden_images_write" on storage.objects for insert with check (bucket_id = 'leitfaden-images' and auth.uid() is not null);
+create policy "leitfaden_images_delete" on storage.objects for delete using (bucket_id = 'leitfaden-images' and auth.uid() is not null);
 
 -- ============================================================
 -- UPDATE v1 (siehe supabase/migrations/002_update_v1.sql)
@@ -392,6 +398,7 @@ create table if not exists leitfaden_articles (
   body text not null default '',
   sort_order int default 0,
   attachments jsonb not null default '[]'::jsonb,
+  images jsonb not null default '[]'::jsonb,
   created_by uuid references profiles(id) on delete set null,
   updated_at timestamptz default now()
 );

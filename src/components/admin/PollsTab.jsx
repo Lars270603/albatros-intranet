@@ -1,6 +1,6 @@
 import { Fragment, useCallback, useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { Plus, Trash2, BarChart3, Eye, ChevronDown, ChevronRight } from 'lucide-react'
+import { Plus, Trash2, BarChart3, Eye, Pencil, ChevronDown, ChevronRight } from 'lucide-react'
 import { motion } from 'motion/react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -28,6 +28,7 @@ export function PollsTab() {
   const [polls, setPolls] = useState([])
   const [loading, setLoading] = useState(true)
   const [createOpen, setCreateOpen] = useState(false)
+  const [editingPoll, setEditingPoll] = useState(null)
   const [expandedId, setExpandedId] = useState(null)
 
   const load = useCallback(async () => {
@@ -135,6 +136,15 @@ export function PollsTab() {
                             <Eye className="h-4 w-4" strokeWidth={1.5} />
                           </Link>
                         </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-8 w-8"
+                          title="Bearbeiten"
+                          onClick={() => setEditingPoll(poll)}
+                        >
+                          <Pencil className="h-4 w-4" strokeWidth={1.5} />
+                        </Button>
                         <AlertDialog>
                           <AlertDialogTrigger asChild>
                             <Button variant="ghost" size="icon" className="h-8 w-8">
@@ -193,6 +203,12 @@ export function PollsTab() {
       )}
 
       <PollCreateDialog open={createOpen} onOpenChange={setCreateOpen} onCreated={load} />
+      <PollCreateDialog
+        open={Boolean(editingPoll)}
+        onOpenChange={(open) => !open && setEditingPoll(null)}
+        onCreated={load}
+        poll={editingPoll}
+      />
     </div>
   )
 }

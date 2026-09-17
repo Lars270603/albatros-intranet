@@ -5,6 +5,7 @@ import { Badge } from '@/components/ui/badge'
 import { SkeletonCard } from '@/components/shared/SkeletonCard'
 import { EmptyState } from '@/components/shared/EmptyState'
 import { InitialsAvatar } from '@/components/shared/InitialsAvatar'
+import { DepartmentBadge } from '@/components/shared/DepartmentBadge'
 import { MemberDetailDialog } from '@/components/team/MemberDetailDialog'
 import { supabase } from '@/lib/supabase'
 
@@ -66,9 +67,12 @@ export default function Team() {
                 <p className="font-display text-[16px] font-bold text-text">
                   {member.first_name} {member.last_name}
                 </p>
-                {member.role === 'admin' && (
-                  <Badge className="border-transparent bg-primary text-white">Admin</Badge>
-                )}
+                <div className="flex flex-wrap items-center justify-center gap-1.5">
+                  {member.role === 'admin' && (
+                    <Badge className="border-transparent bg-primary text-white">Admin</Badge>
+                  )}
+                  <DepartmentBadge department={member.department} />
+                </div>
                 <div className="space-y-1 pt-1">
                   <a
                     href={`mailto:${member.email}`}

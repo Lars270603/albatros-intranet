@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom'
+import { Pencil } from 'lucide-react'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { useToast } from '@/components/ui/use-toast'
@@ -6,11 +7,11 @@ import { formatDate } from '@/lib/dateUtils'
 import { cn } from '@/lib/utils'
 
 /**
- * Zeigt die aktive Umfrage oben im News-Feed. Bleibt nach dem Abstimmen
+ * Zeigt eine aktive Umfrage oben im News-Feed. Bleibt nach dem Abstimmen
  * sichtbar und zeigt dann die Ergebnisbalken statt zu verschwinden.
  * Optionen sind auch nach dem Abstimmen weiterhin klickbar (Stimme ändern).
  */
-export function ActivePollCard({ poll, votes = [], myVote = null, onVote }) {
+export function ActivePollCard({ poll, votes = [], myVote = null, onVote, isAdmin = false, onEdit }) {
   const { toast } = useToast()
 
   if (!poll) return null
@@ -29,8 +30,17 @@ export function ActivePollCard({ poll, votes = [], myVote = null, onVote }) {
 
   return (
     <Card>
-      <CardHeader className="pb-3">
+      <CardHeader className="flex-row items-center justify-between space-y-0 pb-3">
         <p className="label-micro">Umfrage</p>
+        {isAdmin && onEdit && (
+          <button
+            onClick={() => onEdit(poll)}
+            title="Umfrage bearbeiten"
+            className="text-text-muted hover:text-text"
+          >
+            <Pencil className="h-3.5 w-3.5" strokeWidth={1.5} />
+          </button>
+        )}
       </CardHeader>
       <CardContent className="space-y-4">
         <p className="font-display text-[17px] font-bold leading-snug text-text">{poll.question}</p>

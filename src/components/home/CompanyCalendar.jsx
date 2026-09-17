@@ -158,7 +158,7 @@ export function CompanyCalendar() {
   }
 
   return (
-    <Card className="p-6">
+    <Card className="p-5">
       <div className="flex items-center justify-between">
         <p className="label-micro">Firmenkalender</p>
         <div className="flex items-center gap-1">
@@ -181,19 +181,19 @@ export function CompanyCalendar() {
       </div>
 
       {/* Legende */}
-      <div className="mt-4 flex flex-wrap items-center gap-4">
+      <div className="mt-3 flex flex-wrap items-center gap-4">
         <span className="flex items-center gap-1.5 text-[12px] text-text-muted">
-          <span className="h-1.5 w-1.5 rounded-full bg-primary" /> News-Termin
+          <span className="h-[3px] w-3 rounded-full bg-primary" /> News-Termin
         </span>
         <span className="flex items-center gap-1.5 text-[12px] text-text-muted">
-          <span className="h-1.5 w-1.5 rounded-full bg-info" /> Firmentermin
+          <span className="h-[3px] w-3 rounded-full bg-info" /> Firmentermin
         </span>
         <span className="flex items-center gap-1.5 text-[12px] text-text-muted">
-          <span className="h-1.5 w-1.5 rounded-full bg-warning" /> Geburtstag
+          <span className="h-[3px] w-3 rounded-full bg-warning" /> Geburtstag
         </span>
       </div>
 
-      <div className="mt-5 grid grid-cols-7 gap-1.5">
+      <div className="mt-4 grid grid-cols-7 gap-1">
         {WEEKDAYS.map((wd) => (
           <p key={wd} className="pb-1 text-center label-micro">
             {wd}
@@ -213,22 +213,22 @@ export function CompanyCalendar() {
               key={key}
               onClick={() => setSelectedDate(date)}
               className={cn(
-                'flex aspect-square flex-col items-center justify-center gap-1 rounded-[8px] text-[14px] transition-colors duration-150',
+                'flex h-9 flex-col items-center justify-center gap-1 rounded-[8px] text-[12px] transition-colors duration-150',
                 isToday && 'bg-primary font-bold text-white',
                 !isToday && isSelected && 'bg-surface-2 text-text',
                 !isToday && !isSelected && 'text-text hover:bg-primary/5'
               )}
             >
               <span>{date.getDate()}</span>
-              <span className="flex h-1.5 items-center gap-1">
+              <span className="flex h-[3px] items-center gap-[3px]">
                 {hasNewsEvent && (
-                  <span className={cn('h-1.5 w-1.5 rounded-full', isToday ? 'bg-white' : 'bg-primary')} />
+                  <span className={cn('h-[3px] w-2 rounded-full', isToday ? 'bg-white/70' : 'bg-primary')} />
                 )}
                 {hasCompanyEvent && (
-                  <span className={cn('h-1.5 w-1.5 rounded-full', isToday ? 'bg-white' : 'bg-info')} />
+                  <span className={cn('h-[3px] w-2 rounded-full', isToday ? 'bg-white/70' : 'bg-info')} />
                 )}
                 {hasBirthday && (
-                  <span className={cn('h-1.5 w-1.5 rounded-full', isToday ? 'bg-white' : 'bg-warning')} />
+                  <span className={cn('h-[3px] w-2 rounded-full', isToday ? 'bg-white/70' : 'bg-warning')} />
                 )}
               </span>
             </button>
@@ -236,7 +236,7 @@ export function CompanyCalendar() {
         })}
       </div>
 
-      <div className="mt-6 border-t border-border pt-4">
+      <div className="mt-4 border-t border-border pt-3">
         <div className="flex items-center justify-between">
           <p className="text-[13px] font-medium text-text">
             {selectedDate.toLocaleDateString('de-DE', { weekday: 'long', day: 'numeric', month: 'long' })}
@@ -249,7 +249,7 @@ export function CompanyCalendar() {
           )}
         </div>
 
-        <div className="mt-3 space-y-3">
+        <div className="mt-3 space-y-4">
           {selectedNewsEvents.length > 0 && (
             <div className="space-y-1.5">
               {selectedNewsEvents.map((post) => (

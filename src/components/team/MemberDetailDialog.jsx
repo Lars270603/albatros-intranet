@@ -2,6 +2,7 @@ import { Mail, Phone, Hash, Cake } from 'lucide-react'
 import { Dialog, DialogContent } from '@/components/ui/dialog'
 import { Badge } from '@/components/ui/badge'
 import { InitialsAvatar } from '@/components/shared/InitialsAvatar'
+import { DepartmentBadge } from '@/components/shared/DepartmentBadge'
 
 export function MemberDetailDialog({ member, open, onOpenChange }) {
   if (!member) return null
@@ -27,6 +28,9 @@ export function MemberDetailDialog({ member, open, onOpenChange }) {
             {member.role === 'admin' && (
               <Badge className="mt-1.5 border-transparent bg-primary text-white">Admin</Badge>
             )}
+            <div className="mt-1.5">
+              <DepartmentBadge department={member.department} />
+            </div>
           </div>
         </div>
 

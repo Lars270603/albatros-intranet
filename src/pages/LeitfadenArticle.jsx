@@ -5,6 +5,7 @@ import remarkGfm from 'remark-gfm'
 import { ArrowLeft, ExternalLink, Download } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
+import { Dialog, DialogContent } from '@/components/ui/dialog'
 import { EmptyState } from '@/components/shared/EmptyState'
 import { FileTypeIcon } from '@/components/documents/FileTypeIcon'
 import { supabase } from '@/lib/supabase'
@@ -15,6 +16,7 @@ export default function LeitfadenArticle() {
   const navigate = useNavigate()
   const [article, setArticle] = useState(null)
   const [loading, setLoading] = useState(true)
+  const [selectedImageUrl, setSelectedImageUrl] = useState(null)
 
   useEffect(() => {
     let isMounted = true
@@ -127,6 +129,26 @@ export default function LeitfadenArticle() {
         </div>
       )}
 
+      {/* Bildergalerie */}
+      {article.images?.length > 0 && (
+        <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
+          {article.images.map((image, index) => (
+            <button
+              key={index}
+              type="button"
+              onClick={() => setSelectedImageUrl(image.url)}
+              className="aspect-[4/3] overflow-hidden rounded-[10px] border border-border"
+            >
+              <img
+                src={image.url}
+                alt=""
+                className="h-full w-full cursor-pointer object-cover transition-[filter] duration-150 hover:brightness-90"
+              />
+            </button>
+          ))}
+        </div>
+      )}
+
       {/* 3. Markdown-Inhalt — nummerierte Listen als Schritt-Kacheln */}
       {article.body && (
         <div className="prose-specs max-w-[70ch]">
@@ -163,6 +185,13 @@ export default function LeitfadenArticle() {
           </div>
         </div>
       )}
+
+      {/* Bild-Lightbox */}
+      <Dialog open={!!selectedImageUrl} onOpenChange={(open) => !open && setSelectedImageUrl(null)}>
+        <DialogContent className="max-w-4xl border-none bg-transparent p-0 shadow-none">
+          <img src={selectedImageUrl} alt="" className="max-h-[80vh] w-auto rounded-[10px] object-contain" />
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

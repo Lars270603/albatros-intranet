@@ -5,11 +5,12 @@ import { Button } from '@/components/ui/button'
 import { PostCard } from '@/components/feed/PostCard'
 import { PostComposerDialog } from '@/components/feed/PostComposerDialog'
 import { ActivePollCard } from '@/components/news/ActivePollCard'
+import { PollCreateDialog } from '@/components/admin/PollCreateDialog'
 import { SkeletonCard } from '@/components/shared/SkeletonCard'
 import { EmptyState } from '@/components/shared/EmptyState'
 import { useAuth } from '@/hooks/useAuth'
 import { usePosts } from '@/hooks/usePosts'
-import { useActivePoll } from '@/hooks/usePoll'
+import { useActivePolls } from '@/hooks/usePoll'
 import { useToast } from '@/components/ui/use-toast'
 
 const SCOPES = ['general']
@@ -19,9 +20,10 @@ export default function News() {
   const { toast } = useToast()
   const [composerOpen, setComposerOpen] = useState(false)
   const [editingPost, setEditingPost] = useState(null)
+  const [editingPoll, setEditingPoll] = useState(null)
 
   const { posts, loading, togglePin, deletePost, archivePost } = usePosts(SCOPES)
-  const { poll, votes, myVote, castVote } = useActivePoll(SCOPES)
+  const { polls, votesByPoll, myUserId, castVote, reload: reloadPolls } = useActivePolls(SCOPES)
 
   const isAdmin = profile?.role === 'admin'
 
@@ -107,7 +109,23 @@ export default function News() {
               </motion.div>
             ))}
 
-            {poll && <ActivePollCard poll={poll} votes={votes} myVote={myVote} onVote={castVote} />}
+            {polls.map((poll, index) => (
+              <motion.div
+                key={poll.id}
+                initial={{ opacity: 0, y: 6 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.1, ease: 'easeOut', delay: index * 0.035 }}
+              >
+                <ActivePollCard
+                  poll={poll}
+                  votes={votesByPoll[poll.id] || []}
+                  myVote={(votesByPoll[poll.id] || []).find((v) => v.user_id === myUserId) || null}
+                  onVote={(optionId) => castVote(poll.id, optionId)}
+                  isAdmin={isAdmin}
+                  onEdit={setEditingPoll}
+                />
+              </motion.div>
+            ))}
 
             {pinnedPosts.length === 0 && restPosts.length === 0 ? (
               <EmptyState
@@ -145,6 +163,13 @@ export default function News() {
         onOpenChange={handleComposerOpenChange}
         onCreated={() => {}}
         post={editingPost}
+      />
+
+      <PollCreateDialog
+        open={Boolean(editingPoll)}
+        onOpenChange={(open) => !open && setEditingPoll(null)}
+        onCreated={reloadPolls}
+        poll={editingPoll}
       />
     </div>
   )

@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Plus, X, Lock, Eye, ImagePlus } from 'lucide-react'
 import {
   Dialog,
@@ -20,19 +20,43 @@ const ALLOWED_IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/webp']
 const MAX_IMAGE_SIZE = 5 * 1024 * 1024
 
 function emptyOption() {
-  return { label: '', imageFile: null, imagePreview: null }
+  return { label: '', imageFile: null, imagePreview: null, existingImageUrl: null }
 }
 
-export function PollCreateDialog({ open, onOpenChange, onCreated }) {
+function optionsFromPoll(poll) {
+  const opts = (poll?.options || []).map((o) => ({
+    label: o.label || '',
+    imageFile: null,
+    imagePreview: o.image_url || null,
+    existingImageUrl: o.image_url || null,
+  }))
+  while (opts.length < 2) opts.push(emptyOption())
+  return opts
+}
+
+export function PollCreateDialog({ open, onOpenChange, onCreated, poll = null }) {
   const { user } = useAuth()
   const { toast } = useToast()
   const fileInputRefs = useRef({})
+  const isEdit = Boolean(poll)
 
   const [question, setQuestion] = useState('')
   const [options, setOptions] = useState([emptyOption(), emptyOption()])
   const [expiresAt, setExpiresAt] = useState('')
   const [isAnonymous, setIsAnonymous] = useState(false)
   const [submitting, setSubmitting] = useState(false)
+
+  useEffect(() => {
+    if (!open) return
+    if (poll) {
+      setQuestion(poll.question || '')
+      setOptions(optionsFromPoll(poll))
+      setExpiresAt(poll.expires_at ? poll.expires_at.slice(0, 10) : '')
+      setIsAnonymous(Boolean(poll.is_anonymous))
+    } else {
+      reset()
+    }
+  }, [open, poll])
 
   function reset() {
     setQuestion('')
@@ -61,7 +85,9 @@ export function PollCreateDialog({ open, onOpenChange, onCreated }) {
   }
 
   function removeOptionImage(index) {
-    setOptions((prev) => prev.map((o, i) => (i === index ? { ...o, imageFile: null, imagePreview: null } : o)))
+    setOptions((prev) =>
+      prev.map((o, i) => (i === index ? { ...o, imageFile: null, imagePreview: null, existingImageUrl: null } : o))
+    )
   }
 
   function addOption() {
@@ -84,11 +110,12 @@ export function PollCreateDialog({ open, onOpenChange, onCreated }) {
 
     setSubmitting(true)
     try {
-      const pollFolderId = crypto.randomUUID()
+      const pollFolderId = isEdit ? poll.id : crypto.randomUUID()
       const optionObjects = await Promise.all(
         cleanOptions.map(async (option, i) => {
-          const optionId = `opt-${i}-${crypto.randomUUID().slice(0, 6)}`
-          let imageUrl = null
+          const existingId = isEdit ? poll.options?.[i]?.id : null
+          const optionId = existingId || `opt-${i}-${crypto.randomUUID().slice(0, 6)}`
+          let imageUrl = option.existingImageUrl || null
           if (option.imageFile) {
             const ext = option.imageFile.name.split('.').pop()
             imageUrl = await uploadFile('poll-images', option.imageFile, `${pollFolderId}/${optionId}.${ext}`)
@@ -97,23 +124,32 @@ export function PollCreateDialog({ open, onOpenChange, onCreated }) {
         })
       )
 
-      const { error } = await supabase.from('polls').insert({
+      const payload = {
         question,
         options: optionObjects,
-        scope: 'general',
-        created_by: user.id,
         expires_at: expiresAt ? new Date(expiresAt).toISOString() : null,
         is_anonymous: isAnonymous,
-      })
-      if (error) throw error
+      }
 
-      toast({ title: 'Umfrage erstellt' })
+      if (isEdit) {
+        const { error } = await supabase.from('polls').update(payload).eq('id', poll.id)
+        if (error) throw error
+      } else {
+        const { error } = await supabase.from('polls').insert({
+          ...payload,
+          scope: 'general',
+          created_by: user.id,
+        })
+        if (error) throw error
+      }
+
+      toast({ title: isEdit ? 'Umfrage gespeichert' : 'Umfrage erstellt' })
       reset()
       onOpenChange(false)
       onCreated?.()
     } catch (err) {
-      console.error('Umfrage konnte nicht erstellt werden:', err)
-      toast({ variant: 'destructive', title: 'Fehler', description: 'Umfrage konnte nicht erstellt werden.' })
+      console.error('Umfrage konnte nicht gespeichert werden:', err)
+      toast({ variant: 'destructive', title: 'Fehler', description: 'Umfrage konnte nicht gespeichert werden.' })
     } finally {
       setSubmitting(false)
     }
@@ -123,7 +159,7 @@ export function PollCreateDialog({ open, onOpenChange, onCreated }) {
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Neue Umfrage</DialogTitle>
+          <DialogTitle>{isEdit ? 'Umfrage bearbeiten' : 'Neue Umfrage'}</DialogTitle>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-4">

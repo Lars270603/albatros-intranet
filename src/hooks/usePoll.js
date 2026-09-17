@@ -2,39 +2,47 @@ import { useCallback, useEffect, useState } from 'react'
 import { supabase } from '@/lib/supabase'
 import { useAuth } from '@/hooks/useAuth'
 
-export function useActivePoll(scopes) {
+/**
+ * Lädt ALLE aktiven (nicht abgelaufenen) Umfragen, neueste zuerst.
+ */
+export function useActivePolls(scopes) {
   const { user } = useAuth()
-  const [poll, setPoll] = useState(null)
-  const [votes, setVotes] = useState([])
+  const [polls, setPolls] = useState([])
+  const [votesByPoll, setVotesByPoll] = useState({})
   const [loading, setLoading] = useState(true)
 
   const load = useCallback(async () => {
     try {
       const nowIso = new Date().toISOString()
-      const { data: polls, error } = await supabase
+      const { data: activePolls, error } = await supabase
         .from('polls')
         .select('*')
         .in('scope', scopes)
         .or(`expires_at.is.null,expires_at.gt.${nowIso}`)
         .order('created_at', { ascending: false })
-        .limit(1)
       if (error) throw error
 
-      const activePoll = polls?.[0] || null
-      setPoll(activePoll)
+      setPolls(activePolls || [])
 
-      if (activePoll) {
-        const { data: pollVotes, error: votesError } = await supabase
+      const pollIds = (activePolls || []).map((p) => p.id)
+      if (pollIds.length > 0) {
+        const { data: allVotes, error: votesError } = await supabase
           .from('poll_votes')
           .select('*')
-          .eq('poll_id', activePoll.id)
+          .in('poll_id', pollIds)
         if (votesError) throw votesError
-        setVotes(pollVotes || [])
+        const grouped = {}
+        for (const id of pollIds) grouped[id] = []
+        for (const v of allVotes || []) {
+          if (!grouped[v.poll_id]) grouped[v.poll_id] = []
+          grouped[v.poll_id].push(v)
+        }
+        setVotesByPoll(grouped)
       } else {
-        setVotes([])
+        setVotesByPoll({})
       }
     } catch (err) {
-      console.error('Umfrage konnte nicht geladen werden:', err)
+      console.error('Umfragen konnten nicht geladen werden:', err)
     } finally {
       setLoading(false)
     }
@@ -44,24 +52,28 @@ export function useActivePoll(scopes) {
     load()
   }, [load])
 
-  const myVote = votes.find((v) => v.user_id === user?.id) || null
-
   const castVote = useCallback(
-    async (optionId) => {
-      if (!poll || !user) return
-      setVotes((prev) => [...prev.filter((v) => v.user_id !== user.id), { poll_id: poll.id, user_id: user.id, option_id: optionId }])
+    async (pollId, optionId) => {
+      if (!user) return
+      setVotesByPoll((prev) => ({
+        ...prev,
+        [pollId]: [
+          ...(prev[pollId] || []).filter((v) => v.user_id !== user.id),
+          { poll_id: pollId, user_id: user.id, option_id: optionId },
+        ],
+      }))
       try {
         const { error } = await supabase
           .from('poll_votes')
-          .upsert({ poll_id: poll.id, user_id: user.id, option_id: optionId }, { onConflict: 'poll_id,user_id' })
+          .upsert({ poll_id: pollId, user_id: user.id, option_id: optionId }, { onConflict: 'poll_id,user_id' })
         if (error) throw error
       } catch (err) {
         console.error('Stimme konnte nicht gespeichert werden:', err)
         load()
       }
     },
-    [poll, user, load]
+    [user, load]
   )
 
-  return { poll, votes, myVote, loading, castVote }
+  return { polls, votesByPoll, myUserId: user?.id, loading, castVote, reload: load }
 }
