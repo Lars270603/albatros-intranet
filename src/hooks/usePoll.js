@@ -55,6 +55,42 @@ export function useActivePolls(scopes) {
   const castVote = useCallback(
     async (pollId, optionId) => {
       if (!user) return
+      const poll = polls.find((p) => p.id === pollId)
+      const current = votesByPoll[pollId] || []
+
+      if (poll?.multiple_choice) {
+        const alreadySelected = current.some((v) => v.user_id === user.id && v.option_id === optionId)
+        setVotesByPoll((prev) => {
+          const list = prev[pollId] || []
+          return {
+            ...prev,
+            [pollId]: alreadySelected
+              ? list.filter((v) => !(v.user_id === user.id && v.option_id === optionId))
+              : [...list, { poll_id: pollId, user_id: user.id, option_id: optionId }],
+          }
+        })
+        try {
+          if (alreadySelected) {
+            const { error } = await supabase
+              .from('poll_votes')
+              .delete()
+              .eq('poll_id', pollId)
+              .eq('user_id', user.id)
+              .eq('option_id', optionId)
+            if (error) throw error
+          } else {
+            const { error } = await supabase
+              .from('poll_votes')
+              .insert({ poll_id: pollId, user_id: user.id, option_id: optionId })
+            if (error) throw error
+          }
+        } catch (err) {
+          console.error('Stimme konnte nicht gespeichert werden:', err)
+          load()
+        }
+        return
+      }
+
       setVotesByPoll((prev) => ({
         ...prev,
         [pollId]: [
@@ -63,16 +99,22 @@ export function useActivePolls(scopes) {
         ],
       }))
       try {
-        const { error } = await supabase
+        const { error: delError } = await supabase
           .from('poll_votes')
-          .upsert({ poll_id: pollId, user_id: user.id, option_id: optionId }, { onConflict: 'poll_id,user_id' })
-        if (error) throw error
+          .delete()
+          .eq('poll_id', pollId)
+          .eq('user_id', user.id)
+        if (delError) throw delError
+        const { error: insError } = await supabase
+          .from('poll_votes')
+          .insert({ poll_id: pollId, user_id: user.id, option_id: optionId })
+        if (insError) throw insError
       } catch (err) {
         console.error('Stimme konnte nicht gespeichert werden:', err)
         load()
       }
     },
-    [user, load]
+    [user, load, polls, votesByPoll]
   )
 
   return { polls, votesByPoll, myUserId: user?.id, loading, castVote, reload: load }

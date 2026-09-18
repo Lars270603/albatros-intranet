@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import { Pencil } from 'lucide-react'
+import { Check, Pencil } from 'lucide-react'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { useToast } from '@/components/ui/use-toast'
@@ -9,9 +9,10 @@ import { cn } from '@/lib/utils'
 /**
  * Zeigt eine aktive Umfrage oben im News-Feed. Bleibt nach dem Abstimmen
  * sichtbar und zeigt dann die Ergebnisbalken statt zu verschwinden.
- * Optionen sind auch nach dem Abstimmen weiterhin klickbar (Stimme ändern).
+ * Bei Mehrfachauswahl-Umfragen (poll.multiple_choice) sind alle Optionen
+ * jederzeit als Toggle klickbar, mehrere gleichzeitig aktiv.
  */
-export function ActivePollCard({ poll, votes = [], myVote = null, onVote, isAdmin = false, onEdit }) {
+export function ActivePollCard({ poll, votes = [], myVotes = [], onVote, isAdmin = false, onEdit }) {
   const { toast } = useToast()
 
   if (!poll) return null
@@ -19,6 +20,10 @@ export function ActivePollCard({ poll, votes = [], myVote = null, onVote, isAdmi
   const options = poll.options || []
   const totalVotes = votes.length
   const hasImages = options.some((o) => o.image_url)
+  const multiple = Boolean(poll.multiple_choice)
+  const hasVoted = myVotes.length > 0
+  const showResults = multiple || hasVoted
+  const isSelected = (optionId) => myVotes.some((v) => v.option_id === optionId)
 
   async function handleVote(optionId) {
     try {
@@ -31,7 +36,7 @@ export function ActivePollCard({ poll, votes = [], myVote = null, onVote, isAdmi
   return (
     <Card>
       <CardHeader className="flex-row items-center justify-between space-y-0 pb-3">
-        <p className="label-micro">Umfrage</p>
+        <p className="label-micro">Umfrage{multiple ? ' · Mehrfachauswahl' : ''}</p>
         {isAdmin && onEdit && (
           <button
             onClick={() => onEdit(poll)}
@@ -53,7 +58,7 @@ export function ActivePollCard({ poll, votes = [], myVote = null, onVote, isAdmi
             {options.map((option) => {
               const count = votes.filter((v) => v.option_id === option.id).length
               const pct = totalVotes > 0 ? Math.round((count / totalVotes) * 100) : 0
-              const isMine = myVote?.option_id === option.id
+              const selected = isSelected(option.id)
               return (
                 <button
                   key={option.id}
@@ -61,7 +66,7 @@ export function ActivePollCard({ poll, votes = [], myVote = null, onVote, isAdmi
                   onClick={() => handleVote(option.id)}
                   className={cn(
                     'group relative overflow-hidden rounded-[10px] border text-left transition-colors duration-150',
-                    isMine ? 'border-primary ring-2 ring-primary' : 'border-border hover:border-primary'
+                    selected ? 'border-primary ring-2 ring-primary' : 'border-border hover:border-primary'
                   )}
                 >
                   <div className="relative aspect-square w-full">
@@ -72,7 +77,12 @@ export function ActivePollCard({ poll, votes = [], myVote = null, onVote, isAdmi
                         className="h-full w-full object-cover"
                       />
                     )}
-                    {myVote && (
+                    {selected && (
+                      <span className="absolute left-1.5 top-1.5 flex h-5 w-5 items-center justify-center rounded-full bg-primary text-white">
+                        <Check className="h-3 w-3" strokeWidth={2.5} />
+                      </span>
+                    )}
+                    {showResults && (
                       <span className="absolute bottom-1.5 right-1.5 rounded-[4px] bg-black/60 px-1.5 py-0.5 text-[11px] font-medium text-white">
                         {pct}% · {count}
                       </span>
@@ -83,7 +93,7 @@ export function ActivePollCard({ poll, votes = [], myVote = null, onVote, isAdmi
               )
             })}
           </div>
-        ) : !myVote ? (
+        ) : !showResults ? (
           <div className="space-y-2">
             {options.map((option) => (
               <Button
@@ -101,7 +111,7 @@ export function ActivePollCard({ poll, votes = [], myVote = null, onVote, isAdmi
             {options.map((option) => {
               const count = votes.filter((v) => v.option_id === option.id).length
               const pct = totalVotes > 0 ? Math.round((count / totalVotes) * 100) : 0
-              const isMine = myVote.option_id === option.id
+              const selected = isSelected(option.id)
               return (
                 <button
                   key={option.id}
@@ -110,14 +120,26 @@ export function ActivePollCard({ poll, votes = [], myVote = null, onVote, isAdmi
                   className="block w-full space-y-1.5 text-left"
                 >
                   <div className="flex items-center justify-between text-[13px]">
-                    <span className={cn('text-text', isMine && 'font-medium text-primary')}>{option.label}</span>
+                    <span className={cn('flex items-center gap-1.5 text-text', selected && 'font-medium text-primary')}>
+                      {multiple && (
+                        <span
+                          className={cn(
+                            'flex h-3.5 w-3.5 shrink-0 items-center justify-center rounded-[4px] border',
+                            selected ? 'border-primary bg-primary text-white' : 'border-border-strong'
+                          )}
+                        >
+                          {selected && <Check className="h-2.5 w-2.5" strokeWidth={3} />}
+                        </span>
+                      )}
+                      {option.label}
+                    </span>
                     <span className="font-medium text-text-sub">
                       {pct}% · {count} {count === 1 ? 'Stimme' : 'Stimmen'}
                     </span>
                   </div>
                   <div className="h-2 w-full overflow-hidden rounded-[4px] bg-surface-2">
                     <div
-                      className={cn('h-full rounded-[4px]', isMine ? 'bg-primary' : 'bg-text-muted')}
+                      className={cn('h-full rounded-[4px]', selected ? 'bg-primary' : 'bg-text-muted')}
                       style={{ width: `${pct}%` }}
                     />
                   </div>

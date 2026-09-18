@@ -11,6 +11,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
+import { Checkbox } from '@/components/ui/checkbox'
 import { useToast } from '@/components/ui/use-toast'
 import { useAuth } from '@/hooks/useAuth'
 import { supabase } from '@/lib/supabase'
@@ -44,6 +45,7 @@ export function PollCreateDialog({ open, onOpenChange, onCreated, poll = null })
   const [options, setOptions] = useState([emptyOption(), emptyOption()])
   const [expiresAt, setExpiresAt] = useState('')
   const [isAnonymous, setIsAnonymous] = useState(false)
+  const [multipleChoice, setMultipleChoice] = useState(false)
   const [submitting, setSubmitting] = useState(false)
 
   useEffect(() => {
@@ -53,6 +55,7 @@ export function PollCreateDialog({ open, onOpenChange, onCreated, poll = null })
       setOptions(optionsFromPoll(poll))
       setExpiresAt(poll.expires_at ? poll.expires_at.slice(0, 10) : '')
       setIsAnonymous(Boolean(poll.is_anonymous))
+      setMultipleChoice(Boolean(poll.multiple_choice))
     } else {
       reset()
     }
@@ -63,6 +66,7 @@ export function PollCreateDialog({ open, onOpenChange, onCreated, poll = null })
     setOptions([emptyOption(), emptyOption()])
     setExpiresAt('')
     setIsAnonymous(false)
+    setMultipleChoice(false)
   }
 
   function updateOptionLabel(index, value) {
@@ -129,6 +133,7 @@ export function PollCreateDialog({ open, onOpenChange, onCreated, poll = null })
         options: optionObjects,
         expires_at: expiresAt ? new Date(expiresAt).toISOString() : null,
         is_anonymous: isAnonymous,
+        multiple_choice: multipleChoice,
       }
 
       if (isEdit) {
@@ -229,6 +234,21 @@ export function PollCreateDialog({ open, onOpenChange, onCreated, poll = null })
           <div className="space-y-1.5">
             <Label htmlFor="poll-expires">Ablaufdatum (optional)</Label>
             <Input id="poll-expires" type="date" value={expiresAt} onChange={(e) => setExpiresAt(e.target.value)} />
+          </div>
+
+          <div className="flex items-start gap-2.5 rounded-[10px] border border-border p-3">
+            <Checkbox
+              id="poll-multiple"
+              checked={multipleChoice}
+              onCheckedChange={(v) => setMultipleChoice(Boolean(v))}
+              className="mt-0.5"
+            />
+            <Label htmlFor="poll-multiple" className="cursor-pointer normal-case tracking-normal">
+              <span className="block text-[14px] font-medium text-text">Mehrfachauswahl erlauben</span>
+              <span className="mt-0.5 block text-[12px] font-normal text-text-muted">
+                Teilnehmer können mehr als eine Option wählen, z.B. bei einer Auswahl mehrerer Farben.
+              </span>
+            </Label>
           </div>
 
           <div className="space-y-2">

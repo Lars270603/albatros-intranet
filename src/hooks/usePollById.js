@@ -35,23 +35,48 @@ export function usePollById(pollId) {
     load()
   }, [load])
 
-  const myVote = votes.find((v) => v.user_id === user?.id) || null
+  const myVotes = votes.filter((v) => v.user_id === user?.id)
+  const myVote = myVotes[0] || null
 
   const castVote = useCallback(
     async (optionId) => {
       if (!poll || !user) return
       try {
-        const { error } = await supabase
-          .from('poll_votes')
-          .upsert({ poll_id: poll.id, user_id: user.id, option_id: optionId }, { onConflict: 'poll_id,user_id' })
-        if (error) throw error
+        if (poll.multiple_choice) {
+          const alreadySelected = votes.some((v) => v.user_id === user.id && v.option_id === optionId)
+          if (alreadySelected) {
+            const { error } = await supabase
+              .from('poll_votes')
+              .delete()
+              .eq('poll_id', poll.id)
+              .eq('user_id', user.id)
+              .eq('option_id', optionId)
+            if (error) throw error
+          } else {
+            const { error } = await supabase
+              .from('poll_votes')
+              .insert({ poll_id: poll.id, user_id: user.id, option_id: optionId })
+            if (error) throw error
+          }
+        } else {
+          const { error: delError } = await supabase
+            .from('poll_votes')
+            .delete()
+            .eq('poll_id', poll.id)
+            .eq('user_id', user.id)
+          if (delError) throw delError
+          const { error: insError } = await supabase
+            .from('poll_votes')
+            .insert({ poll_id: poll.id, user_id: user.id, option_id: optionId })
+          if (insError) throw insError
+        }
         await load()
       } catch (err) {
         console.error('Stimme konnte nicht gespeichert werden:', err)
       }
     },
-    [poll, user, load]
+    [poll, user, votes, load]
   )
 
-  return { poll, votes, myVote, loading, castVote }
+  return { poll, votes, myVote, myVotes, loading, castVote }
 }

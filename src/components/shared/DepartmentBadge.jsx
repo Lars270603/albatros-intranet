@@ -9,6 +9,11 @@ export const DEPARTMENTS = {
     bg: 'var(--dept-geschaeftsfuehrung-bg)',
     fg: 'var(--dept-geschaeftsfuehrung-fg)',
   },
+  assistenz_gf: {
+    label: 'Assistenz d. GF',
+    bg: 'var(--dept-assistenz-gf-bg)',
+    fg: 'var(--dept-assistenz-gf-fg)',
+  },
 }
 
 export function DepartmentBadge({ department, className }) {

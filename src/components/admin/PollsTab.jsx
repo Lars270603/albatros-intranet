@@ -118,11 +118,16 @@ export function PollsTab() {
                     </TableCell>
                     <TableCell className="font-medium text-text">{poll.question}</TableCell>
                     <TableCell>
-                      {isExpired ? (
-                        <Badge className="border-transparent bg-warning-light text-warning">Abgelaufen</Badge>
-                      ) : (
-                        <Badge className="border-transparent bg-success-light text-success">Aktiv</Badge>
-                      )}
+                      <div className="flex flex-wrap gap-1.5">
+                        {isExpired ? (
+                          <Badge className="border-transparent bg-warning-light text-warning">Abgelaufen</Badge>
+                        ) : (
+                          <Badge className="border-transparent bg-success-light text-success">Aktiv</Badge>
+                        )}
+                        {poll.multiple_choice && (
+                          <Badge className="border-transparent bg-surface-2 text-text-sub">Mehrfachauswahl</Badge>
+                        )}
+                      </div>
                     </TableCell>
                     <TableCell>
                       {poll.creator?.first_name} {poll.creator?.last_name}

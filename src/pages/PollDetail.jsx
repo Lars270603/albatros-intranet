@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useParams } from 'react-router-dom'
-import { Lock, Eye } from 'lucide-react'
+import { Lock, Eye, Check } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import {
@@ -21,7 +21,7 @@ const MAX_AVATARS = 5
 
 export default function PollDetail() {
   const { id } = useParams()
-  const { poll, votes, myVote, loading, castVote } = usePollById(id)
+  const { poll, votes, myVotes, loading, castVote } = usePollById(id)
   const [selected, setSelected] = useState(null)
 
   if (loading) {
@@ -36,6 +36,10 @@ export default function PollDetail() {
   const totalVotes = votes.length
   const hasImages = options.some((o) => o.image_url)
   const isExpired = poll.expires_at && new Date(poll.expires_at) < new Date()
+  const multiple = Boolean(poll.multiple_choice)
+  const hasVoted = myVotes.length > 0
+  const isSelected = (optionId) => myVotes.some((v) => v.option_id === optionId)
+  const showSelectionFlow = !multiple && !hasVoted && !isExpired
 
   async function handleVote(optionId) {
     await castVote(optionId)
@@ -79,7 +83,7 @@ export default function PollDetail() {
               const optionVotes = votes.filter((v) => v.option_id === option.id)
               const count = optionVotes.length
               const pct = totalVotes > 0 ? Math.round((count / totalVotes) * 100) : 0
-              const isMine = myVote?.option_id === option.id
+              const isMine = isSelected(option.id)
               return (
                 <button
                   key={option.id}
@@ -96,7 +100,12 @@ export default function PollDetail() {
                     {option.image_url && (
                       <img src={option.image_url} alt={option.label} className="h-full w-full object-cover" />
                     )}
-                    {myVote && (
+                    {isMine && (
+                      <span className="absolute left-1.5 top-1.5 flex h-5 w-5 items-center justify-center rounded-full bg-primary text-white">
+                        <Check className="h-3 w-3" strokeWidth={2.5} />
+                      </span>
+                    )}
+                    {(multiple || hasVoted) && (
                       <span className="absolute bottom-1.5 right-1.5 rounded-[4px] bg-black/60 px-1.5 py-0.5 text-[11px] font-medium text-white">
                         {pct}% · {count}
                       </span>
@@ -108,7 +117,7 @@ export default function PollDetail() {
             })}
           </div>
         </div>
-      ) : !myVote && !isExpired ? (
+      ) : showSelectionFlow ? (
         <div className="space-y-3">
           {options.map((option) => (
             <Button
@@ -133,19 +142,30 @@ export default function PollDetail() {
             const optionVotes = votes.filter((v) => v.option_id === option.id)
             const count = optionVotes.length
             const pct = totalVotes > 0 ? Math.round((count / totalVotes) * 100) : 0
-            const isMine = myVote?.option_id === option.id
+            const isMine = isSelected(option.id)
+            const clickable = !isExpired
 
             return (
               <div key={option.id} className="space-y-1.5">
                 <button
                   type="button"
-                  disabled={isExpired}
-                  onClick={() => !isExpired && handleVote(option.id)}
-                  className={cn('flex w-full items-center justify-between text-[14px]', isExpired && 'cursor-default')}
+                  disabled={!clickable}
+                  onClick={() => clickable && handleVote(option.id)}
+                  className={cn('flex w-full items-center justify-between text-[14px]', !clickable && 'cursor-default')}
                 >
-                  <span className="font-medium text-text">
+                  <span className="flex items-center font-medium text-text">
+                    {multiple && (
+                      <span
+                        className={cn(
+                          'mr-2 flex h-3.5 w-3.5 shrink-0 items-center justify-center rounded-[4px] border',
+                          isMine ? 'border-primary bg-primary text-white' : 'border-border-strong'
+                        )}
+                      >
+                        {isMine && <Check className="h-2.5 w-2.5" strokeWidth={3} />}
+                      </span>
+                    )}
                     {option.label}
-                    {isMine && <span className="ml-2 text-[12px] font-medium text-primary">Deine Stimme</span>}
+                    {isMine && !multiple && <span className="ml-2 text-[12px] font-medium text-primary">Deine Stimme</span>}
                   </span>
                   <span className="text-text-sub">
                     {pct}% · {count} {count === 1 ? 'Stimme' : 'Stimmen'}

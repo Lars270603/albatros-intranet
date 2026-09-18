@@ -119,7 +119,7 @@ export default function News() {
                 <ActivePollCard
                   poll={poll}
                   votes={votesByPoll[poll.id] || []}
-                  myVote={(votesByPoll[poll.id] || []).find((v) => v.user_id === myUserId) || null}
+                  myVotes={(votesByPoll[poll.id] || []).filter((v) => v.user_id === myUserId)}
                   onVote={(optionId) => castVote(poll.id, optionId)}
                   isAdmin={isAdmin}
                   onEdit={setEditingPoll}
