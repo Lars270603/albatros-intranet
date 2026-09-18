@@ -62,6 +62,12 @@ export default function ProductDetail() {
     load()
   }, [load])
 
+  useEffect(() => {
+    if (!loading && product?.archived && profile?.role !== 'admin') {
+      navigate('/products', { replace: true })
+    }
+  }, [loading, product, profile, navigate])
+
   async function handleSave() {
     setSaving(true)
     try {
@@ -116,6 +122,10 @@ export default function ProductDetail() {
   }
 
   const canEdit = profile?.role === 'admin'
+
+  if (product.archived && !canEdit) {
+    return null
+  }
   const images = product.product_images
   const mainImage = images[activeImage]?.image_url
 

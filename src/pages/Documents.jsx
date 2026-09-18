@@ -1,7 +1,18 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import { Search, ArchiveRestore, Archive } from 'lucide-react'
+import { Search, ArchiveRestore, Archive, Trash2 } from 'lucide-react'
 import { Input } from '@/components/ui/input'
 import { Dialog, DialogContent } from '@/components/ui/dialog'
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@/components/ui/alert-dialog'
 import { EmptyState } from '@/components/shared/EmptyState'
 import { SkeletonCard } from '@/components/shared/SkeletonCard'
 import { PostCard } from '@/components/feed/PostCard'
@@ -49,6 +60,18 @@ export default function Documents() {
     } catch (err) {
       console.error('Beitrag konnte nicht wiederhergestellt werden:', err)
       toast({ variant: 'destructive', title: 'Fehler', description: 'Aktion fehlgeschlagen.' })
+    }
+  }
+
+  async function handleDelete(post) {
+    try {
+      const { error } = await supabase.from('news_posts').delete().eq('id', post.id)
+      if (error) throw error
+      setPosts((prev) => prev.filter((p) => p.id !== post.id))
+      toast({ title: 'Beitrag gelöscht' })
+    } catch (err) {
+      console.error('Beitrag konnte nicht gelöscht werden:', err)
+      toast({ variant: 'destructive', title: 'Fehler', description: 'Löschen fehlgeschlagen.' })
     }
   }
 
@@ -102,13 +125,37 @@ export default function Documents() {
                 {post.body && <p className="mt-1 line-clamp-2 text-[13px] text-text-sub">{post.body}</p>}
               </button>
               {isAdmin && (
-                <button
-                  onClick={() => handleUnarchive(post)}
-                  title="Zurück in News"
-                  className="mt-0.5 shrink-0 text-text-muted hover:text-primary"
-                >
-                  <ArchiveRestore className="h-4 w-4" strokeWidth={1.5} />
-                </button>
+                <div className="mt-0.5 flex shrink-0 items-center gap-2">
+                  <button
+                    onClick={() => handleUnarchive(post)}
+                    title="Zurück in News"
+                    className="text-text-muted hover:text-primary"
+                  >
+                    <ArchiveRestore className="h-4 w-4" strokeWidth={1.5} />
+                  </button>
+                  <AlertDialog>
+                    <AlertDialogTrigger asChild>
+                      <button title="Löschen" className="text-text-muted hover:text-primary">
+                        <Trash2 className="h-4 w-4" strokeWidth={1.5} />
+                      </button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent>
+                      <AlertDialogHeader>
+                        <AlertDialogTitle>Beitrag endgültig löschen?</AlertDialogTitle>
+                        <AlertDialogDescription>Dieser Beitrag wird endgültig gelöscht.</AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter>
+                        <AlertDialogCancel>Abbrechen</AlertDialogCancel>
+                        <AlertDialogAction
+                          onClick={() => handleDelete(post)}
+                          className="bg-destructive text-destructive-foreground hover:bg-red-700"
+                        >
+                          Löschen
+                        </AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
+                </div>
               )}
             </div>
           ))}

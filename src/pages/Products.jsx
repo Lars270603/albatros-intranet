@@ -1,42 +1,89 @@
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { motion } from 'motion/react'
 import { Plus, Package } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { SkeletonCard } from '@/components/shared/SkeletonCard'
 import { EmptyState } from '@/components/shared/EmptyState'
 import { ProductCard } from '@/components/products/ProductCard'
+import { useToast } from '@/components/ui/use-toast'
 import { useAuth } from '@/hooks/useAuth'
 import { supabase } from '@/lib/supabase'
 import { canCreateProducts } from '@/lib/permissions'
 
 export default function Products() {
   const { profile } = useAuth()
+  const { toast } = useToast()
   const navigate = useNavigate()
+  const isAdmin = profile?.role === 'admin'
+
+  const [tab, setTab] = useState('active')
   const [products, setProducts] = useState([])
   const [loading, setLoading] = useState(true)
 
-  useEffect(() => {
-    async function load() {
-      try {
-        const { data, error } = await supabase
-          .from('products')
-          .select('*, creator:profiles(*), product_images(*)')
-          .order('created_at', { ascending: false })
-        if (error) throw error
-        const withSortedImages = (data || []).map((p) => ({
-          ...p,
-          product_images: [...(p.product_images || [])].sort((a, b) => a.sort_order - b.sort_order),
-        }))
-        setProducts(withSortedImages)
-      } catch (err) {
-        console.error('Produkte konnten nicht geladen werden:', err)
-      } finally {
-        setLoading(false)
-      }
+  const showArchived = isAdmin && tab === 'archived'
+
+  const load = useCallback(async () => {
+    setLoading(true)
+    try {
+      const { data, error } = await supabase
+        .from('products')
+        .select('*, creator:profiles(*), product_images(*)')
+        .eq('archived', showArchived)
+        .order('created_at', { ascending: false })
+      if (error) throw error
+      const withSortedImages = (data || []).map((p) => ({
+        ...p,
+        product_images: [...(p.product_images || [])].sort((a, b) => a.sort_order - b.sort_order),
+      }))
+      setProducts(withSortedImages)
+    } catch (err) {
+      console.error('Produkte konnten nicht geladen werden:', err)
+    } finally {
+      setLoading(false)
     }
+  }, [showArchived])
+
+  useEffect(() => {
     load()
-  }, [])
+  }, [load])
+
+  async function handleArchive(id) {
+    try {
+      const { error } = await supabase.from('products').update({ archived: true }).eq('id', id)
+      if (error) throw error
+      setProducts((prev) => prev.filter((p) => p.id !== id))
+      toast({ title: 'Produkt archiviert' })
+    } catch (err) {
+      console.error('Produkt konnte nicht archiviert werden:', err)
+      toast({ variant: 'destructive', title: 'Fehler', description: 'Aktion fehlgeschlagen.' })
+    }
+  }
+
+  async function handleRestore(id) {
+    try {
+      const { error } = await supabase.from('products').update({ archived: false }).eq('id', id)
+      if (error) throw error
+      setProducts((prev) => prev.filter((p) => p.id !== id))
+      toast({ title: 'Produkt wiederhergestellt' })
+    } catch (err) {
+      console.error('Produkt konnte nicht wiederhergestellt werden:', err)
+      toast({ variant: 'destructive', title: 'Fehler', description: 'Aktion fehlgeschlagen.' })
+    }
+  }
+
+  async function handleDelete(id) {
+    try {
+      const { error } = await supabase.from('products').delete().eq('id', id)
+      if (error) throw error
+      setProducts((prev) => prev.filter((p) => p.id !== id))
+      toast({ title: 'Produkt gelöscht' })
+    } catch (err) {
+      console.error('Produkt konnte nicht gelöscht werden:', err)
+      toast({ variant: 'destructive', title: 'Fehler', description: 'Löschen fehlgeschlagen.' })
+    }
+  }
 
   const canCreate = canCreateProducts(profile)
 
@@ -52,6 +99,15 @@ export default function Products() {
         )}
       </div>
 
+      {isAdmin && (
+        <Tabs value={tab} onValueChange={setTab}>
+          <TabsList>
+            <TabsTrigger value="active">Aktuell</TabsTrigger>
+            <TabsTrigger value="archived">Archiviert</TabsTrigger>
+          </TabsList>
+        </Tabs>
+      )}
+
       {loading ? (
         <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
           <SkeletonCard variant="product" />
@@ -61,10 +117,16 @@ export default function Products() {
       ) : products.length === 0 ? (
         <EmptyState
           icon={Package}
-          title="Keine Produkte gefunden"
-          description={canCreate ? 'Lege das erste Produkt an.' : 'Schau später noch einmal vorbei.'}
-          actionLabel={canCreate ? 'Produkt anlegen' : undefined}
-          onAction={canCreate ? () => navigate('/products/new') : undefined}
+          title={showArchived ? 'Keine archivierten Produkte' : 'Keine Produkte gefunden'}
+          description={
+            showArchived
+              ? 'Archivierte Produkte erscheinen hier.'
+              : canCreate
+                ? 'Lege das erste Produkt an.'
+                : 'Schau später noch einmal vorbei.'
+          }
+          actionLabel={!showArchived && canCreate ? 'Produkt anlegen' : undefined}
+          onAction={!showArchived && canCreate ? () => navigate('/products/new') : undefined}
         />
       ) : (
         <div className="columns-1 gap-5 sm:columns-2 lg:columns-3">
@@ -76,7 +138,14 @@ export default function Products() {
               transition={{ duration: 0.1, delay: Math.min(index * 0.035, 0.35) }}
               className="mb-5 break-inside-avoid"
             >
-              <ProductCard product={product} />
+              <ProductCard
+                product={product}
+                isAdmin={isAdmin}
+                archived={showArchived}
+                onArchive={handleArchive}
+                onRestore={handleRestore}
+                onDelete={handleDelete}
+              />
             </motion.div>
           ))}
         </div>
