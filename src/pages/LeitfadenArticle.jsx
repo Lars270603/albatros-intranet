@@ -66,11 +66,12 @@ export default function LeitfadenArticle() {
   }
 
   const HeroIcon = resolveIcon(article.icon)
+  const backTo = article.category_id ? `/leitfaden?category=${article.category_id}` : '/leitfaden'
 
   return (
     <div className="space-y-8">
       <Link
-        to="/leitfaden"
+        to={backTo}
         className="inline-flex items-center gap-1.5 text-[13px] text-text-sub hover:text-text"
       >
         <ArrowLeft className="h-3.5 w-3.5" strokeWidth={1.5} />
@@ -85,7 +86,7 @@ export default function LeitfadenArticle() {
               <HeroIcon className="h-6 w-6 text-white" strokeWidth={1.5} />
             </div>
             <div>
-              <h1 className="font-display text-[28px] font-extrabold leading-tight tracking-[-0.03em]">
+              <h1 className="font-display text-[28px] font-extrabold leading-tight tracking-[-0.03em] text-white">
                 {article.title}
               </h1>
               {article.short_description && (

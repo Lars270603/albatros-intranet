@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 import { ChevronRight, ChevronUp, ChevronDown, Pencil, Plus, Trash2 } from 'lucide-react'
 import { motion } from 'motion/react'
 import { Button } from '@/components/ui/button'
@@ -28,6 +28,7 @@ export default function Leitfaden() {
   const { profile, user } = useAuth()
   const { toast } = useToast()
   const navigate = useNavigate()
+  const [searchParams, setSearchParams] = useSearchParams()
   const isAdmin = profile?.role === 'admin'
   const {
     categories,
@@ -43,7 +44,8 @@ export default function Leitfaden() {
     moveArticle,
   } = useLeitfaden()
 
-  const [activeCategoryId, setActiveCategoryId] = useState(null)
+  const activeCategoryId = searchParams.get('category')
+  const setActiveCategoryId = (id) => setSearchParams({ category: id })
   const [categoryDialogOpen, setCategoryDialogOpen] = useState(false)
   const [editingCategory, setEditingCategory] = useState(null)
   const [articleDialogOpen, setArticleDialogOpen] = useState(false)
