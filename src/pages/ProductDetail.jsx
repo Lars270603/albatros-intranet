@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { useParams, Link, useNavigate } from 'react-router-dom'
 import { AnimatePresence, motion } from 'motion/react'
 import ReactMarkdown from 'react-markdown'
@@ -40,6 +40,14 @@ export default function ProductDetail() {
   const [form, setForm] = useState({ name: '', brand: '', description: '', specs: '' })
   const [saving, setSaving] = useState(false)
 
+  const mountedRef = useRef(true)
+  useEffect(() => {
+    mountedRef.current = true
+    return () => {
+      mountedRef.current = false
+    }
+  }, [])
+
   const load = useCallback(async () => {
     try {
       const { data, error } = await supabase
@@ -47,14 +55,22 @@ export default function ProductDetail() {
         .select('*, creator:profiles(*), product_images(*)')
         .eq('id', id)
         .single()
-      if (error) throw error
+      if (error) {
+        // PGRST116 = 0 Zeilen gefunden (z.B. gerade gelöscht) — kein echter Fehler, Produkt existiert einfach nicht mehr
+        if (error.code === 'PGRST116') {
+          if (mountedRef.current) setProduct(null)
+          return
+        }
+        throw error
+      }
       data.product_images = [...(data.product_images || [])].sort((a, b) => a.sort_order - b.sort_order)
+      if (!mountedRef.current) return
       setProduct(data)
       setForm({ name: data.name, brand: data.brand, description: data.description || '', specs: data.specs || '' })
     } catch (err) {
       console.error('Produkt konnte nicht geladen werden:', err)
     } finally {
-      setLoading(false)
+      if (mountedRef.current) setLoading(false)
     }
   }, [id])
 

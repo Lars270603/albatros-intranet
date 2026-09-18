@@ -61,8 +61,8 @@ export default function Products() {
         console.error('Archivieren: unerwartete Anzahl betroffener Zeilen:', data)
         throw new Error('Unerwartete Anzahl betroffener Zeilen')
       }
-      setProducts((prev) => prev.filter((p) => p.id !== id))
       toast({ title: 'Produkt archiviert' })
+      await load()
     } catch (err) {
       console.error('Produkt konnte nicht archiviert werden:', err)
       toast({ variant: 'destructive', title: 'Fehler', description: 'Aktion fehlgeschlagen.' })
@@ -81,8 +81,8 @@ export default function Products() {
         console.error('Wiederherstellen: unerwartete Anzahl betroffener Zeilen:', data)
         throw new Error('Unerwartete Anzahl betroffener Zeilen')
       }
-      setProducts((prev) => prev.filter((p) => p.id !== id))
       toast({ title: 'Produkt wiederhergestellt' })
+      await load()
     } catch (err) {
       console.error('Produkt konnte nicht wiederhergestellt werden:', err)
       toast({ variant: 'destructive', title: 'Fehler', description: 'Aktion fehlgeschlagen.' })
@@ -101,8 +101,8 @@ export default function Products() {
         console.error('Löschen: unerwartete Anzahl betroffener Zeilen:', data)
         throw new Error('Unerwartete Anzahl betroffener Zeilen')
       }
-      setProducts((prev) => prev.filter((p) => p.id !== id))
       toast({ title: 'Produkt gelöscht' })
+      await load()
     } catch (err) {
       console.error('Produkt konnte nicht gelöscht werden:', err)
       toast({ variant: 'destructive', title: 'Fehler', description: 'Löschen fehlgeschlagen.' })
