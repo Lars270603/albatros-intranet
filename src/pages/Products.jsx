@@ -50,9 +50,17 @@ export default function Products() {
   }, [load])
 
   async function handleArchive(id) {
+    if (!id) {
+      console.error('handleArchive: keine Produkt-ID übergeben')
+      return
+    }
     try {
-      const { error } = await supabase.from('products').update({ archived: true }).eq('id', id)
+      const { data, error } = await supabase.from('products').update({ archived: true }).eq('id', id).select('id')
       if (error) throw error
+      if (!data || data.length !== 1) {
+        console.error('Archivieren: unerwartete Anzahl betroffener Zeilen:', data)
+        throw new Error('Unerwartete Anzahl betroffener Zeilen')
+      }
       setProducts((prev) => prev.filter((p) => p.id !== id))
       toast({ title: 'Produkt archiviert' })
     } catch (err) {
@@ -62,9 +70,17 @@ export default function Products() {
   }
 
   async function handleRestore(id) {
+    if (!id) {
+      console.error('handleRestore: keine Produkt-ID übergeben')
+      return
+    }
     try {
-      const { error } = await supabase.from('products').update({ archived: false }).eq('id', id)
+      const { data, error } = await supabase.from('products').update({ archived: false }).eq('id', id).select('id')
       if (error) throw error
+      if (!data || data.length !== 1) {
+        console.error('Wiederherstellen: unerwartete Anzahl betroffener Zeilen:', data)
+        throw new Error('Unerwartete Anzahl betroffener Zeilen')
+      }
       setProducts((prev) => prev.filter((p) => p.id !== id))
       toast({ title: 'Produkt wiederhergestellt' })
     } catch (err) {
@@ -74,9 +90,17 @@ export default function Products() {
   }
 
   async function handleDelete(id) {
+    if (!id) {
+      console.error('handleDelete: keine Produkt-ID übergeben')
+      return
+    }
     try {
-      const { error } = await supabase.from('products').delete().eq('id', id)
+      const { data, error } = await supabase.from('products').delete().eq('id', id).select('id')
       if (error) throw error
+      if (!data || data.length !== 1 || data[0].id !== id) {
+        console.error('Löschen: unerwartete Anzahl betroffener Zeilen:', data)
+        throw new Error('Unerwartete Anzahl betroffener Zeilen')
+      }
       setProducts((prev) => prev.filter((p) => p.id !== id))
       toast({ title: 'Produkt gelöscht' })
     } catch (err) {

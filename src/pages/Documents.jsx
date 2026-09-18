@@ -52,9 +52,21 @@ export default function Documents() {
   }, [load])
 
   async function handleUnarchive(post) {
+    if (!post?.id) {
+      console.error('handleUnarchive: kein Beitrag/keine ID übergeben')
+      return
+    }
     try {
-      const { error } = await supabase.from('news_posts').update({ archived: false }).eq('id', post.id)
+      const { data, error } = await supabase
+        .from('news_posts')
+        .update({ archived: false })
+        .eq('id', post.id)
+        .select('id')
       if (error) throw error
+      if (!data || data.length !== 1) {
+        console.error('Wiederherstellen: unerwartete Anzahl betroffener Zeilen:', data)
+        throw new Error('Unerwartete Anzahl betroffener Zeilen')
+      }
       setPosts((prev) => prev.filter((p) => p.id !== post.id))
       toast({ title: 'Beitrag zurück in News verschoben' })
     } catch (err) {
@@ -64,9 +76,17 @@ export default function Documents() {
   }
 
   async function handleDelete(post) {
+    if (!post?.id) {
+      console.error('handleDelete: kein Beitrag/keine ID übergeben')
+      return
+    }
     try {
-      const { error } = await supabase.from('news_posts').delete().eq('id', post.id)
+      const { data, error } = await supabase.from('news_posts').delete().eq('id', post.id).select('id')
       if (error) throw error
+      if (!data || data.length !== 1 || data[0].id !== post.id) {
+        console.error('Löschen: unerwartete Anzahl betroffener Zeilen:', data)
+        throw new Error('Unerwartete Anzahl betroffener Zeilen')
+      }
       setPosts((prev) => prev.filter((p) => p.id !== post.id))
       toast({ title: 'Beitrag gelöscht' })
     } catch (err) {
