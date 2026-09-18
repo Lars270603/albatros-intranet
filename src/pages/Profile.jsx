@@ -6,7 +6,9 @@ import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { Label } from '@/components/ui/label'
 import { Separator } from '@/components/ui/separator'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { InitialsAvatar } from '@/components/shared/InitialsAvatar'
+import { DEPARTMENTS } from '@/components/shared/DepartmentBadge'
 import { useToast } from '@/components/ui/use-toast'
 import { useAuth } from '@/hooks/useAuth'
 import { supabase } from '@/lib/supabase'
@@ -23,6 +25,7 @@ export default function Profile() {
   const [extension, setExtension] = useState(profile?.extension || '')
   const [bio, setBio] = useState(profile?.bio || '')
   const [birthday, setBirthday] = useState(profile?.birthday || '')
+  const [department, setDepartment] = useState(profile?.department || '')
   const [savingProfile, setSavingProfile] = useState(false)
   const [uploadingAvatar, setUploadingAvatar] = useState(false)
 
@@ -62,6 +65,7 @@ export default function Profile() {
           extension: extension || null,
           bio: bio || null,
           birthday: birthday || null,
+          department: department || null,
         })
         .eq('id', user.id)
       if (error) throw error
@@ -176,12 +180,29 @@ export default function Profile() {
               <p className="text-right text-[12px] text-text-muted">{bio.length} / 120</p>
             </div>
 
-            <div className="space-y-1.5">
-              <Label htmlFor="birthday">Geburtstag</Label>
-              <Input id="birthday" type="date" value={birthday || ''} onChange={(e) => setBirthday(e.target.value)} />
-              <p className="text-[12px] text-text-muted">
-                Nur Tag und Monat werden im Team-Widget angezeigt
-              </p>
+            <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-1.5">
+                <Label htmlFor="birthday">Geburtstag</Label>
+                <Input id="birthday" type="date" value={birthday || ''} onChange={(e) => setBirthday(e.target.value)} />
+                <p className="text-[12px] text-text-muted">
+                  Nur Tag und Monat werden im Team-Widget angezeigt
+                </p>
+              </div>
+              <div className="space-y-1.5">
+                <Label htmlFor="department">Abteilung</Label>
+                <Select value={department} onValueChange={setDepartment}>
+                  <SelectTrigger id="department">
+                    <SelectValue placeholder="Abteilung wählen" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {Object.entries(DEPARTMENTS).map(([value, { label }]) => (
+                      <SelectItem key={value} value={value}>
+                        {label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
 
             <Button type="submit" disabled={savingProfile}>
