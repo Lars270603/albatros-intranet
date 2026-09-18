@@ -1,10 +1,14 @@
+import { Fragment, useState } from 'react'
 import { Mail, Phone, Hash, Cake } from 'lucide-react'
 import { Dialog, DialogContent } from '@/components/ui/dialog'
 import { Badge } from '@/components/ui/badge'
 import { InitialsAvatar } from '@/components/shared/InitialsAvatar'
 import { DepartmentBadge } from '@/components/shared/DepartmentBadge'
+import { cn } from '@/lib/utils'
 
 export function MemberDetailDialog({ member, open, onOpenChange }) {
+  const [lightboxOpen, setLightboxOpen] = useState(false)
+
   if (!member) return null
 
   const birthdayLabel = member.birthday
@@ -12,15 +16,22 @@ export function MemberDetailDialog({ member, open, onOpenChange }) {
     : null
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-md">
+    <Fragment>
+      <Dialog open={open} onOpenChange={onOpenChange}>
+        <DialogContent className="max-w-md">
         <div className="flex items-center gap-4">
-          <InitialsAvatar
-            firstName={member.first_name}
-            lastName={member.last_name}
-            avatarUrl={member.avatar_url}
-            size={96}
-          />
+          <button
+            type="button"
+            onClick={() => member.avatar_url && setLightboxOpen(true)}
+            className={cn('rounded-full', member.avatar_url && 'cursor-pointer')}
+          >
+            <InitialsAvatar
+              firstName={member.first_name}
+              lastName={member.last_name}
+              avatarUrl={member.avatar_url}
+              size={96}
+            />
+          </button>
           <div>
             <p className="font-display text-[22px] font-extrabold leading-tight text-text">
               {member.first_name} {member.last_name}
@@ -72,6 +83,19 @@ export function MemberDetailDialog({ member, open, onOpenChange }) {
           </div>
         )}
       </DialogContent>
-    </Dialog>
+      </Dialog>
+
+      {member.avatar_url && (
+        <Dialog open={lightboxOpen} onOpenChange={setLightboxOpen}>
+          <DialogContent className="max-w-[440px] border-none bg-transparent p-0 shadow-none">
+            <img
+              src={member.avatar_url}
+              alt={`${member.first_name} ${member.last_name}`}
+              className="w-full rounded-[10px] object-contain"
+            />
+          </DialogContent>
+        </Dialog>
+      )}
+    </Fragment>
   )
 }
