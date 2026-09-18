@@ -7,7 +7,7 @@ const TILES = [
   { to: '/team', label: 'Team', icon: Users, bg: 'var(--success-light)', fg: 'var(--success)' },
   { to: '/documents', label: 'Archiv', icon: Archive, bg: 'var(--warning-light)', fg: 'var(--warning)' },
   { to: '/products', label: 'Neue Produkte', icon: Package, bg: 'var(--violet-light)', fg: 'var(--violet)' },
-  { to: '/leitfaden', label: 'Leitfaden', icon: Compass, bg: 'var(--accent-light)', fg: 'var(--accent)' },
+  { to: '/leitfaden', label: 'Allgemeine Infos', icon: Compass, bg: 'var(--accent-light)', fg: 'var(--accent)' },
 ]
 
 export function QuickAccessGrid() {

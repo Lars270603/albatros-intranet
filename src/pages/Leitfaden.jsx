@@ -84,7 +84,7 @@ export default function Leitfaden() {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="font-display text-[32px] font-extrabold tracking-[-0.04em] text-text">Leitfaden</h1>
+        <h1 className="font-display text-[32px] font-extrabold tracking-[-0.04em] text-text">Allgemeine Infos</h1>
         {isAdmin && (
           <Button
             size="sm"

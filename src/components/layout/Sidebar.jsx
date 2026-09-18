@@ -13,7 +13,7 @@ const NAV_ITEMS = [
   { to: '/news', label: 'News', icon: Newspaper },
   { to: '/documents', label: 'Archiv', icon: Archive },
   { to: '/products', label: 'Neue Produkte', icon: Package },
-  { to: '/leitfaden', label: 'Leitfaden', icon: Compass },
+  { to: '/leitfaden', label: 'Allgemeine Infos', icon: Compass },
   { to: '/team', label: 'Team', icon: Users },
 ]
 

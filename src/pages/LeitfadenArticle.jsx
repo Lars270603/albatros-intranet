@@ -59,7 +59,7 @@ export default function LeitfadenArticle() {
         <EmptyState title="Artikel nicht gefunden" description="Dieser Artikel existiert nicht (mehr)." />
         <Button variant="outline" onClick={() => navigate('/leitfaden')}>
           <ArrowLeft className="h-3.5 w-3.5" strokeWidth={1.5} />
-          Zurück zum Leitfaden
+          Zurück zu Allgemeine Infos
         </Button>
       </div>
     )
@@ -74,7 +74,7 @@ export default function LeitfadenArticle() {
         className="inline-flex items-center gap-1.5 text-[13px] text-text-sub hover:text-text"
       >
         <ArrowLeft className="h-3.5 w-3.5" strokeWidth={1.5} />
-        Leitfaden
+        Allgemeine Infos
       </Link>
 
       {/* 1. Roter Hero-Bereich */}
