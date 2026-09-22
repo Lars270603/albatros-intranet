@@ -6,24 +6,46 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
+import {
   Dialog,
   DialogContent,
   DialogFooter,
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@/components/ui/alert-dialog'
 import { useCalendarEvents } from '@/hooks/useCalendarEvents'
 import { useAuth } from '@/hooks/useAuth'
 import { useToast } from '@/components/ui/use-toast'
 import { supabase } from '@/lib/supabase'
+import { expandEvents, toDateKey } from '@/lib/recurrence'
 import { cn } from '@/lib/utils'
 
 const WEEKDAYS = ['Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa', 'So']
 const MONTH_LABEL = new Intl.DateTimeFormat('de-DE', { month: 'long', year: 'numeric' })
 
-function toDateKey(date) {
-  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`
-}
+const RECURRENCE_OPTIONS = [
+  { value: 'none', label: 'Einmalig' },
+  { value: 'weekly', label: 'Wöchentlich' },
+  { value: 'biweekly', label: 'Alle 2 Wochen' },
+  { value: 'monthly', label: 'Monatlich' },
+]
 
 function buildMonthGrid(viewDate) {
   const year = viewDate.getFullYear()
@@ -57,6 +79,9 @@ export function CompanyCalendar() {
   const [selectedDate, setSelectedDate] = useState(new Date())
   const [addOpen, setAddOpen] = useState(false)
   const [newTitle, setNewTitle] = useState('')
+  const [newTime, setNewTime] = useState('')
+  const [newRecurrence, setNewRecurrence] = useState('none')
+  const [newRecurrenceEndDate, setNewRecurrenceEndDate] = useState('')
 
   useEffect(() => {
     async function loadBirthdays() {
@@ -96,14 +121,16 @@ export function CompanyCalendar() {
   const cells = useMemo(() => buildMonthGrid(viewDate), [viewDate])
 
   const eventsByDay = useMemo(() => {
+    const monthStart = new Date(viewDate.getFullYear(), viewDate.getMonth(), 1)
+    const monthEnd = new Date(viewDate.getFullYear(), viewDate.getMonth() + 1, 0)
     const map = {}
-    for (const ev of events) {
-      const key = ev.event_date
+    for (const occurrence of expandEvents(events, monthStart, monthEnd)) {
+      const key = toDateKey(occurrence.occurrenceDate)
       if (!map[key]) map[key] = []
-      map[key].push(ev)
+      map[key].push(occurrence)
     }
     return map
-  }, [events])
+  }, [events, viewDate])
 
   const newsEventsByDay = useMemo(() => {
     const map = {}
@@ -134,12 +161,25 @@ export function CompanyCalendar() {
   const selectedBirthdays = birthdaysOn(selectedDate)
   const hasAnySelected = selectedEvents.length + selectedNewsEvents.length + selectedBirthdays.length > 0
 
+  function resetAddForm() {
+    setNewTitle('')
+    setNewTime('')
+    setNewRecurrence('none')
+    setNewRecurrenceEndDate('')
+  }
+
   async function handleAddEvent(e) {
     e.preventDefault()
     if (!newTitle.trim()) return
     try {
-      await addEvent({ title: newTitle.trim(), eventDate: selectedKey })
-      setNewTitle('')
+      await addEvent({
+        title: newTitle.trim(),
+        eventDate: selectedKey,
+        eventTime: newTime || null,
+        recurrence: newRecurrence,
+        recurrenceEndDate: newRecurrenceEndDate || null,
+      })
+      resetAddForm()
       setAddOpen(false)
       toast({ title: 'Termin hinzugefügt' })
     } catch (err) {
@@ -158,7 +198,7 @@ export function CompanyCalendar() {
   }
 
   return (
-    <Card className="p-5">
+    <Card id="company-calendar" className="p-5">
       <div className="flex items-center justify-between">
         <p className="label-micro">Firmenkalender</p>
         <div className="flex items-center gap-1">
@@ -268,15 +308,42 @@ export function CompanyCalendar() {
           {selectedEvents.length > 0 && (
             <div className="space-y-1.5">
               {selectedEvents.map((ev) => (
-                <div key={ev.id} className="flex items-center justify-between text-[13px] text-text">
+                <div
+                  key={`${ev.id}-${toDateKey(ev.occurrenceDate)}`}
+                  className="flex items-center justify-between text-[13px] text-text"
+                >
                   <span className="flex items-center gap-2">
                     <CalendarDays className="h-3.5 w-3.5 shrink-0 text-info" strokeWidth={1.5} />
                     {ev.title}
+                    {ev.event_time && <span className="text-text-muted">{ev.event_time.slice(0, 5)}</span>}
                   </span>
                   {isAdmin && (
-                    <button onClick={() => handleDeleteEvent(ev.id)} className="text-text-muted hover:text-primary">
-                      <Trash2 className="h-3.5 w-3.5" strokeWidth={1.5} />
-                    </button>
+                    <AlertDialog>
+                      <AlertDialogTrigger asChild>
+                        <button className="text-text-muted hover:text-primary">
+                          <Trash2 className="h-3.5 w-3.5" strokeWidth={1.5} />
+                        </button>
+                      </AlertDialogTrigger>
+                      <AlertDialogContent>
+                        <AlertDialogHeader>
+                          <AlertDialogTitle>Termin löschen?</AlertDialogTitle>
+                          <AlertDialogDescription>
+                            {ev.recurrence && ev.recurrence !== 'none'
+                              ? 'Dies löscht die gesamte Serie.'
+                              : 'Diese Aktion kann nicht rückgängig gemacht werden.'}
+                          </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                          <AlertDialogCancel>Abbrechen</AlertDialogCancel>
+                          <AlertDialogAction
+                            onClick={() => handleDeleteEvent(ev.id)}
+                            className="bg-destructive text-destructive-foreground hover:bg-red-700"
+                          >
+                            Löschen
+                          </AlertDialogAction>
+                        </AlertDialogFooter>
+                      </AlertDialogContent>
+                    </AlertDialog>
                   )}
                 </div>
               ))}
@@ -298,7 +365,13 @@ export function CompanyCalendar() {
         </div>
       </div>
 
-      <Dialog open={addOpen} onOpenChange={setAddOpen}>
+      <Dialog
+        open={addOpen}
+        onOpenChange={(open) => {
+          setAddOpen(open)
+          if (!open) resetAddForm()
+        }}
+      >
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Termin hinzufügen</DialogTitle>
@@ -308,6 +381,47 @@ export function CompanyCalendar() {
               <Label htmlFor="event-title">Titel</Label>
               <Input id="event-title" required value={newTitle} onChange={(e) => setNewTitle(e.target.value)} />
             </div>
+
+            <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-1.5">
+                <Label htmlFor="event-time">Uhrzeit (optional)</Label>
+                <Input
+                  id="event-time"
+                  type="time"
+                  value={newTime}
+                  onChange={(e) => setNewTime(e.target.value)}
+                />
+              </div>
+              <div className="space-y-1.5">
+                <Label htmlFor="event-recurrence">Wiederholung</Label>
+                <Select value={newRecurrence} onValueChange={setNewRecurrence}>
+                  <SelectTrigger id="event-recurrence">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {RECURRENCE_OPTIONS.map((opt) => (
+                      <SelectItem key={opt.value} value={opt.value}>
+                        {opt.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+
+            {newRecurrence !== 'none' && (
+              <div className="space-y-1.5">
+                <Label htmlFor="event-recurrence-end">Wiederholen bis (optional)</Label>
+                <Input
+                  id="event-recurrence-end"
+                  type="date"
+                  value={newRecurrenceEndDate}
+                  onChange={(e) => setNewRecurrenceEndDate(e.target.value)}
+                />
+                <p className="text-[12px] text-text-muted">Leer lassen für eine unbegrenzte Wiederholung.</p>
+              </div>
+            )}
+
             <p className="text-[13px] text-text-sub">
               Datum: {selectedDate.toLocaleDateString('de-DE', { day: 'numeric', month: 'long', year: 'numeric' })}
             </p>

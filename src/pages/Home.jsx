@@ -3,6 +3,7 @@ import { HomeHero } from '@/components/home/HomeHero'
 import { QuickAccessGrid } from '@/components/home/QuickAccessGrid'
 import { NewsWidget } from '@/components/home/NewsWidget'
 import { CompanyCalendar } from '@/components/home/CompanyCalendar'
+import { UpcomingEvents } from '@/components/home/UpcomingEvents'
 
 export default function Home() {
   const { profile } = useAuth()
@@ -10,6 +11,8 @@ export default function Home() {
   return (
     <div className="space-y-8">
       <HomeHero firstName={profile?.first_name} />
+
+      <UpcomingEvents />
 
       <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_360px]">
         <QuickAccessGrid />

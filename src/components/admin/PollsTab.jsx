@@ -125,7 +125,9 @@ export function PollsTab() {
                           <Badge className="border-transparent bg-success-light text-success">Aktiv</Badge>
                         )}
                         {poll.multiple_choice && (
-                          <Badge className="border-transparent bg-surface-2 text-text-sub">Mehrfachauswahl</Badge>
+                          <Badge className="border-transparent bg-surface-2 text-text-sub">
+                            Mehrfachauswahl ({poll.max_choices} {poll.max_choices === 1 ? 'Stimme' : 'Stimmen'})
+                          </Badge>
                         )}
                       </div>
                     </TableCell>

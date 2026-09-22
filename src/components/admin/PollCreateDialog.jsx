@@ -46,6 +46,7 @@ export function PollCreateDialog({ open, onOpenChange, onCreated, poll = null })
   const [expiresAt, setExpiresAt] = useState('')
   const [isAnonymous, setIsAnonymous] = useState(false)
   const [multipleChoice, setMultipleChoice] = useState(false)
+  const [maxChoices, setMaxChoices] = useState(2)
   const [submitting, setSubmitting] = useState(false)
 
   useEffect(() => {
@@ -56,6 +57,7 @@ export function PollCreateDialog({ open, onOpenChange, onCreated, poll = null })
       setExpiresAt(poll.expires_at ? poll.expires_at.slice(0, 10) : '')
       setIsAnonymous(Boolean(poll.is_anonymous))
       setMultipleChoice(Boolean(poll.multiple_choice))
+      setMaxChoices(poll.max_choices && poll.max_choices >= 2 ? poll.max_choices : 2)
     } else {
       reset()
     }
@@ -67,6 +69,7 @@ export function PollCreateDialog({ open, onOpenChange, onCreated, poll = null })
     setExpiresAt('')
     setIsAnonymous(false)
     setMultipleChoice(false)
+    setMaxChoices(2)
   }
 
   function updateOptionLabel(index, value) {
@@ -134,6 +137,7 @@ export function PollCreateDialog({ open, onOpenChange, onCreated, poll = null })
         expires_at: expiresAt ? new Date(expiresAt).toISOString() : null,
         is_anonymous: isAnonymous,
         multiple_choice: multipleChoice,
+        max_choices: multipleChoice ? Math.max(2, Number(maxChoices) || 2) : 1,
       }
 
       if (isEdit) {
@@ -243,12 +247,29 @@ export function PollCreateDialog({ open, onOpenChange, onCreated, poll = null })
               onCheckedChange={(v) => setMultipleChoice(Boolean(v))}
               className="mt-0.5"
             />
-            <Label htmlFor="poll-multiple" className="cursor-pointer normal-case tracking-normal">
-              <span className="block text-[14px] font-medium text-text">Mehrfachauswahl erlauben</span>
-              <span className="mt-0.5 block text-[12px] font-normal text-text-muted">
-                Teilnehmer können mehr als eine Option wählen, z.B. bei einer Auswahl mehrerer Farben.
-              </span>
-            </Label>
+            <div className="flex-1 space-y-2">
+              <Label htmlFor="poll-multiple" className="cursor-pointer normal-case tracking-normal">
+                <span className="block text-[14px] font-medium text-text">Mehrfachauswahl erlauben</span>
+                <span className="mt-0.5 block text-[12px] font-normal text-text-muted">
+                  Teilnehmer können mehr als eine Option wählen, z.B. bei einer Auswahl mehrerer Farben.
+                </span>
+              </Label>
+              {multipleChoice && (
+                <div className="space-y-1.5 pt-1">
+                  <Label htmlFor="poll-max-choices" className="normal-case tracking-normal">
+                    Wie viele Stimmen hat jede Person?
+                  </Label>
+                  <Input
+                    id="poll-max-choices"
+                    type="number"
+                    min={2}
+                    className="w-24"
+                    value={maxChoices}
+                    onChange={(e) => setMaxChoices(e.target.value)}
+                  />
+                </div>
+              )}
+            </div>
           </div>
 
           <div className="space-y-2">

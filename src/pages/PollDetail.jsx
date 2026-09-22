@@ -71,6 +71,17 @@ export default function PollDetail() {
         <p className="text-[13px] text-text-muted">
           Erstellt von {poll.creator?.first_name} {poll.creator?.last_name} · {formatDate(poll.created_at)}
         </p>
+        {multiple && poll.max_choices > 1 && (
+          <p className="text-[13px] text-text-muted">
+            Wähle bis zu {poll.max_choices} Optionen
+            {hasVoted && (
+              <span className="font-medium text-primary">
+                {' '}
+                · Du hast noch {Math.max(poll.max_choices - myVotes.length, 0)} von {poll.max_choices} Stimmen übrig
+              </span>
+            )}
+          </p>
+        )}
       </div>
 
       {hasImages ? (

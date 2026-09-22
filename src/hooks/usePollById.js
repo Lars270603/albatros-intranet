@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from 'react'
 import { supabase } from '@/lib/supabase'
 import { useAuth } from '@/hooks/useAuth'
+import { toast } from '@/components/ui/use-toast'
 
 export function usePollById(pollId) {
   const { user } = useAuth()
@@ -44,6 +45,18 @@ export function usePollById(pollId) {
       try {
         if (poll.multiple_choice) {
           const alreadySelected = votes.some((v) => v.user_id === user.id && v.option_id === optionId)
+          const maxChoices = poll.max_choices || 1
+          const myVoteCount = votes.filter((v) => v.user_id === user.id).length
+
+          if (!alreadySelected && myVoteCount >= maxChoices) {
+            toast({
+              variant: 'destructive',
+              title: 'Limit erreicht',
+              description: `Du hast bereits alle ${maxChoices} Stimmen vergeben. Wähle zuerst eine Option ab um eine andere zu wählen.`,
+            })
+            return
+          }
+
           if (alreadySelected) {
             const { error } = await supabase
               .from('poll_votes')

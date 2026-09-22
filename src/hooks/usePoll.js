@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from 'react'
 import { supabase } from '@/lib/supabase'
 import { useAuth } from '@/hooks/useAuth'
+import { toast } from '@/components/ui/use-toast'
 
 /**
  * Lädt ALLE aktiven (nicht abgelaufenen) Umfragen, neueste zuerst.
@@ -60,6 +61,18 @@ export function useActivePolls(scopes) {
 
       if (poll?.multiple_choice) {
         const alreadySelected = current.some((v) => v.user_id === user.id && v.option_id === optionId)
+        const maxChoices = poll.max_choices || 1
+        const myVoteCount = current.filter((v) => v.user_id === user.id).length
+
+        if (!alreadySelected && myVoteCount >= maxChoices) {
+          toast({
+            variant: 'destructive',
+            title: 'Limit erreicht',
+            description: `Du hast bereits alle ${maxChoices} Stimmen vergeben. Wähle zuerst eine Option ab um eine andere zu wählen.`,
+          })
+          return
+        }
+
         setVotesByPoll((prev) => {
           const list = prev[pollId] || []
           return {

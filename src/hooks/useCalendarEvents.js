@@ -26,10 +26,15 @@ export function useCalendarEvents() {
     load()
   }, [load])
 
-  async function addEvent({ title, eventDate }) {
-    const { error } = await supabase
-      .from('calendar_events')
-      .insert({ title, event_date: eventDate, created_by: user.id })
+  async function addEvent({ title, eventDate, eventTime, recurrence, recurrenceEndDate }) {
+    const { error } = await supabase.from('calendar_events').insert({
+      title,
+      event_date: eventDate,
+      event_time: eventTime || null,
+      recurrence: recurrence || 'none',
+      recurrence_end_date: recurrence && recurrence !== 'none' ? recurrenceEndDate || null : null,
+      created_by: user.id,
+    })
     if (error) throw error
     await load()
   }
