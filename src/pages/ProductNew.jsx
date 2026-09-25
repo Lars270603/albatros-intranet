@@ -65,6 +65,9 @@ export default function ProductNew() {
         message: `Neues Produkt: ${name}`,
         refId: product.id,
       })
+      supabase.functions
+        .invoke('notify-new-content', { body: { type: 'product', id: product.id } })
+        .catch((err) => console.error('E-Mail-Benachrichtigung konnte nicht ausgelöst werden:', err))
 
       toast({ title: 'Produkt gespeichert' })
       navigate(`/products/${product.id}`)

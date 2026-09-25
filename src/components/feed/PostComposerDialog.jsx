@@ -167,6 +167,9 @@ export function PostComposerDialog({ open, onOpenChange, onCreated, post = null 
           message: `Neuer Beitrag: ${title}`,
           refId: currentPost.id,
         })
+        supabase.functions
+          .invoke('notify-new-content', { body: { type: 'news_post', id: currentPost.id } })
+          .catch((err) => console.error('E-Mail-Benachrichtigung konnte nicht ausgelöst werden:', err))
       }
 
       toast({ title: isEdit ? 'Beitrag gespeichert' : 'Beitrag veröffentlicht' })
