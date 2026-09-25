@@ -122,8 +122,13 @@ serve(async (req) => {
   const client = new SMTPClient({
     connection: {
       hostname: 'smtp.ionos.de',
-      port: 587,
-      tls: false, // STARTTLS wird auf Port 587 automatisch verhandelt
+      // Port 465 mit implizitem TLS statt 587+STARTTLS: STARTTLS-Verbindungen
+      // lösen in Deno beim Socket-Upgrade einen bekannten, von den
+      // denomailer-Maintainern als "wontfix" eingestuften Laufzeitfehler aus
+      // (BadResource beim TLS-Handshake). IONOS unterstützt Port 465 mit
+      // SSL/TLS als offiziell gleichwertige Alternative.
+      port: 465,
+      tls: true,
       auth: {
         username: IONOS_SMTP_USER,
         password: IONOS_SMTP_PASSWORD,
